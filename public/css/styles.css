@@ -1,0 +1,9 @@
+.katex-html[aria-hidden="true"] {
+    display: none !important;
+}
+div[class="content"] {
+    font-size: 1.2em;
+    line-height: 1.5em;
+    margin: 0 auto;
+    
+}
