@@ -14,7 +14,7 @@
 }
 
 #content.collapsed {
-  transform: translateX(-125px);
+  transform: translateX(-125px) ;
 }
 
 body {
@@ -23,7 +23,6 @@ body {
   flex-direction: row;
   height: 100vh; /* 设置高度为视口高度 */
   overflow: hidden; /* 隐藏溢出内容 */
-  font-family: Arial, sans-serif;
 }
 
 /* Sidebar container */

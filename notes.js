@@ -7,10 +7,11 @@ const router = express.Router();
 const katexExtension = require("./katex_ext.ts");
 const ftree = require("./files.js");
 const ejs = require("ejs");
-const {options, default_index} = require("./options.js");
+const {options, default_index, katex_macros} = require("./options.js");
 // Serve static files (CSS, JS, etc.)
 // 读取文件树为json备用
 // 打开template备用
+const filter = require('./mdFilter.js');
 const template_string = fs.readFileSync(options.template, 'utf8');
 marked.use({
     gfm: true,
@@ -19,7 +20,9 @@ marked.use({
 
 
 
-marked.use(katexExtension({throwOnError: false}));
+marked.use(katexExtension({
+    throwOnError: false,
+    macros: katex_macros}));
 // marked.use(markedKatex({
 //     nonStandard: true,
 //     throwOnError: false,
@@ -87,28 +90,28 @@ var handler = function(req, res) {
                 break;
             }
         }
-        // if not found, return a list of files in the directory
+
         if(!found) {
             err=true;
             errmsg = 'Directory Description Not Found: ' + path_;
-            // res.status(404).send('Directory Description Not Found: ' + Info['pathname']);
-            // return;
-            // errmsg = 'Directory Description Not Found: ' + pathname;
+
         }
     } else { // accessing a file
-        // res_path = path.join(options.md_base,Info['pathname']);
+
     }
     console.log(`path_: ${path_},err: ${err}`);
     if(err){
         data = errmsg;
     }else{
         data = fs.readFileSync(path_, 'utf8');
+        data = filter(data);
     }
    
     var servestatic = Info['ext'] == '.md' ? false : true;
     
     if(!Info['isPath'] && servestatic){
-        res.sendFile(path.resolve(path_), function (err) {
+        const absolutePath = path.resolve(path_);
+        res.sendFile(absolutePath, function (err) {
             if (err) {
                 console.error('Error serving file:', err);
                 res.status(err.status || 500).send('Error serving file');
