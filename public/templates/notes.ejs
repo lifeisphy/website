@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sidebar Example</title>
+  <title>My Notes</title>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"> -->
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/content.css">
 </head>
 <body>
   <div id="sidebar">
@@ -13,7 +15,7 @@
       <% entries.forEach(function(entry) { %>
         <% if (entry.isfile) { %>
           <div class="sidebar-item">
-            <a href="<%= entry.path %>" data-partial = "true">📄 <%= entry.filename %></a>
+            <a href="<%= entry.path %>" class="sidebar-item" data-partial = "true">📄 <%= entry.filename %></a>
           </div>
         <% } else { %>
           <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">

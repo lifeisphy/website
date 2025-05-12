@@ -7,7 +7,7 @@ const router = express.Router();
 const katexExtension = require("./katex_ext.ts");
 const ftree = require("./files.js");
 const ejs = require("ejs");
-const options = require("./options.js").options;
+const {options, default_index} = require("./options.js");
 // Serve static files (CSS, JS, etc.)
 // 读取文件树为json备用
 // 打开template备用
@@ -49,83 +49,87 @@ function extractContent(html) {
     const endIndex = html.indexOf(endTag, startIndex) + endTag.length;
     return html.substring(startIndex, endIndex);
 }
-var handler = function(req, res) {
-    console.log(`${req.baseUrl},${req.url},${req.path}`);
+function parseRequest(req){
     const pathname = decodeURIComponent(req.path);
-    
-    console.log(pathname);
     const partial = req.query.partial === 'true'; // 是否为局部请求
-    
-    // const filename = req.query.filename;
-    // string is a path if ends with / or the last part do not contain a dot
+    // string is a path if it ends with a /, or the last part do not contain a dot
+    // something like /a/b/c/, or /a/b/c
     const isPath = pathname.endsWith('/') || pathname.split('/').pop().indexOf('.') === -1;
     const filename = isPath? undefined : pathname.split('/').pop();
-    console.log(`isPath:${isPath}, pathname:${pathname}, filename: ${filename}`);
-
+    return {
+        pathname: pathname,
+        partial: partial,
+        isPath: isPath,
+        filename: filename,
+        ext: isPath? undefined : path.extname(pathname),
+    };
+}
+var handler = function(req, res) {
+    // console.log(`${req.baseUrl},${req.url},${req.path}`);
+    const Info = parseRequest(req);
+    console.log(Info);
     var err=false;
     var errmsg = null;
-    if(isPath){ // 目录
-        var path_ = path.join(options.md_base, pathname);
+    var path_ = path.join(options.md_base, Info['pathname']);
+    if(Info['isPath']){ // accessing a directory
         if(!fs.statSync(path_).isDirectory()){
-            err = true;
-            errmsg = 'Directory Not Found: ' + pathname;
+            res.status(404).send('Not a directory: ' + path_);
+            return;
         }
         // try to find index.md or README.md in the path
         var found = false;
-        for(const file of ['index.md', 'README.md']){
+        for(const file of default_index){
             res_path = path.join(path_, file);
-            console.log(`checking ${res_path}`);
+            // console.log(`checking ${res_path}`);
             if(fs.existsSync(res_path)){
                 found = true;
+                path_ = res_path;
                 break;
             }
         }
         // if not found, return a list of files in the directory
         if(!found) {
-            err = true;
-            errmsg = 'Directory Description Not Found: ' + pathname;
+            err=true;
+            errmsg = 'Directory Description Not Found: ' + path_;
+            // res.status(404).send('Directory Description Not Found: ' + Info['pathname']);
+            // return;
+            // errmsg = 'Directory Description Not Found: ' + pathname;
         }
-    } else {
-        // check extension 
-        res_path = path.join(options.md_base,pathname);
+    } else { // accessing a file
+        // res_path = path.join(options.md_base,Info['pathname']);
     }
-    try {
-        data = fs.readFileSync(res_path, 'utf8');
-    } catch (error){
-        if(error.code === 'ENOENT') {
-            data = '## File not found: ' + res_path;
-        }else{
-            data = '## Error reading file: ' + error.message;
-        }
-    }
-    var ext = path.extname(res_path);
-    var servestatic = ext == '.md' ? false : true;
-    var htmlContent = null;
+    console.log(`path_: ${path_},err: ${err}`);
     if(err){
-        htmlContent = '<h1>ERROR</h1><p>' + errmsg + '</p>';
-    } else {
-        var data;
-        
-        if(ext === '.md'){
-            // 处理markdown文件
-            htmlContent = marked(data);
-        }else {
-            // 按照静态文件处理
-            htmlContent = data;
-        }
-        htmlContent = marked(data);
-    }
-    if (!partial) {
-        // 渲染完整页面
-        if(ext === '.md'){
-         ejs.renderFile(options.template, { 'file_tree': file_tree, 'content': htmlContent }, function (err, str) {
-             htmlContent = str;
-         });
-    }
-    if(servestatic){
-        
+        data = errmsg;
     }else{
-    res.send(htmlContent);
+        data = fs.readFileSync(path_, 'utf8');
+    }
+   
+    var servestatic = Info['ext'] == '.md' ? false : true;
+    
+    if(!Info['isPath'] && servestatic){
+        res.sendFile(path.resolve(path_), function (err) {
+            if (err) {
+                console.error('Error serving file:', err);
+                res.status(err.status || 500).send('Error serving file');
+            }
+        });
+    }else{
+        var htmlContent = marked(data);
+        if (!Info['partial']) {
+            // 渲染完整页面
+            ejs.renderFile(options.template, { 'file_tree': file_tree, 'content': htmlContent }, function (err, str) {
+                if (err) {
+                    console.error('Error rendering template:', err);
+                    res.status(500).send('Error rendering template');
+                    return;
+                }
+                res.send(str);
+            });
+        }else {
+            // 渲染局部页面
+            res.send(htmlContent);
+        }
     }
 };
 

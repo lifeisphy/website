@@ -1,0 +1,10 @@
+#content a {
+    color: #007BFF; /* Default link color (blue) */
+    text-decoration: underline; /* Underline links */
+    font-weight: bold; /* Make links bold for visibility */
+  }
+  
+  #content a:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: none; /* Remove underline on hover */
+  }

@@ -4,4 +4,5 @@ options = {
     'md_base': 'public/md',
     'template': 'public/templates/notes.ejs',
 }
-module.exports = { options} 
+default_index = ['index.md', 'README.md'];
+module.exports = { options, default_index }; 
