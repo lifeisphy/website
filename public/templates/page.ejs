@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Notes</title>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"> -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/content.css">
+</head>
+<body>
+  <div id="sidebar">
+
+    <% function renderEntries(entries) { %>
+      <% entries.forEach(function(entry) { %>
+        <% if (entry.isfile) { %>
+          <div class="sidebar-item">
+            <a href="<%= entry.path %>" class="sidebar-item" data-partial = "true"> <%= entry.filename.split('.md')[0] %></a>
+          </div>
+        <% } else { %>
+          <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">
+            <a href="<%= entry.path %>" data-partial = "true">📁 <%= entry.directory %></a>
+          </div>
+          <div id="<%= entry.id %>" class="sidebar-subitems" style="display: none;">
+            <% renderEntries(entry.children); %> <!-- Recursive call -->
+          </div>
+        <% } %>
+      <% }); %>
+    <% } %>
+
+    <% renderEntries(file_tree); %> <!-- Initial call -->
+
+    <div id="item1" class="sidebar-subitems">
+      <div class="sidebar-item"> File 1.1</div>
+      <div class="sidebar-item"> File 1.2</div>
+    </div>
+
+    <!-- <div class="sidebar-item" onclick="toggleSubItems('item2')">📁 Main Folder 2</div>
+    <div id="item2" class="sidebar-subitems">
+      <div class="sidebar-item">📄 File 2.1</div>
+      <div class="sidebar-item">📄 File 2.2</div>
+    </div> -->
+  </div>
+  <button id="toggleButton">≡</button>
+  <div id="content">
+    <%- content || 'Welcome to the notes app!' %>
+  </div>
+  <button id="toolbar-button"></button>
+  <div id="toolbar">
+    <div> Fontsize
+      <button id="fontsize-plus">+</button>
+      <button id="fontsize-minus">-</button>
+    </div>  
+    <div> BGM
+      <button id="chg-bgpic">Change Background Picture</button>
+      <button id="chg-bgm">Change BGM</button>
+      <button id="stop-bgm">Start/Stop BGM</button>
+    </div>
+  </div>
+</body>
+<script src="/js/notes_main.js"></script>
+</html>

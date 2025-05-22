@@ -1,0 +1,16 @@
+<% if(show_time) { %>
+  <div class="time">Created: <%- t.create_time  || 'undefined' %></div><div class="time">Updated: <%- t.alter_time || 'undefined' %></div>
+<% } %>
+<% if(show_header) { %>
+  <div class="header">
+  </div>
+<% } %>
+<!-- add a separating line-->
+<div class="line"></div>
+
+<%- content %>
+<% if(show_footer) { %>
+  <div class="footer">
+  </div>
+<% } %>
+
