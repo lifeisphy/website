@@ -1,7 +1,7 @@
 // [{'isfile':true,'filename':'README.md','path':'/README.md'},{'isfile':false,'directory':'1','path':'/1','children':[...]}]
 const fs = require('fs');
 const path = require('path');
-const options = require("./options.js").options;
+const options = require("../options.js").options;
 const base64 = (str) => {
     return Buffer.from(str).toString('base64');
 }

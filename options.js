@@ -13,6 +13,6 @@ katex_macros = {
 show_time= true;
 filter_options = {
     showYAML: true,
-
+    zhihu: false,
 }
 module.exports = { options, default_index, katex_macros, filter_options };

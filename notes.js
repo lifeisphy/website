@@ -4,14 +4,14 @@ const path = require('path');
 const markedKatex = require("marked-katex-extension");
 const express = require("express");
 const router = express.Router();
-const katexExtension = require("./katex_ext.ts");
-const ftree = require("./files.js");
+const katexExtension = require("./utils/katex_ext.ts");
+const ftree = require("./utils/files.js");
 const ejs = require("ejs");
 const { options, default_index, katex_macros } = require("./options.js");
 // Serve static files (CSS, JS, etc.)
 // 读取文件树为json备用
 // 打开template备用
-const { filter_before, filter_after } = require('./mdFilter.js');
+const { filter_before, filter_after } = require('./utils/mdFilter.js');
 const getTime = require('./utils/file_stat.js');
 // const template_string = fs.readFileSync(options.page_emplate, 'utf8');
 
@@ -26,16 +26,7 @@ marked.use(katexExtension({
     throwOnError: false,
     macros: katex_macros
 }));
-// marked.use(markedKatex({
-//     nonStandard: true,
-//     throwOnError: false,
-//     delimiters : [
-//         {left: "$$", right: "$$", display: true},
-//         {left: "\\[", right: "\\]", display: true},
-//         {left: "\\(", right: "\\)", display: false},
-//         {left: "$", right: "$", display: false},
-//     ]
-// }))
+
 function parseRequest(req) {
     const pathname = decodeURIComponent(req.path);
     const partial = req.query.partial === 'true'; // 是否为局部请求
@@ -51,12 +42,13 @@ function parseRequest(req) {
         ext: isPath ? undefined : path.extname(pathname),
     };
 }
+
 var handler = function (req, res) {
     // console.log(`${req.baseUrl},${req.url},${req.path}`);
     const Info = parseRequest(req);
     console.log(Info);
     var fs_path = path.join(options.md_base, Info['pathname']);
-    if (Info['isPath']) { // accessing a directory
+    if (Info['isPath']) { // accessing a directory, make sure which file to show
         if (!fs.statSync(fs_path).isDirectory()) {
             res.status(404).send('Not a directory: ' + Info['pathname']);
             return;
@@ -79,8 +71,6 @@ var handler = function (req, res) {
             res.status(404).send(errmsg);
             return;
         }
-    } else { // accessing a file
-
     }
     console.log(`fs_path: ${fs_path}`);
     // var data = String();
@@ -89,7 +79,7 @@ var handler = function (req, res) {
             res.status(404).send('File Not Found: ' + fs_path);
             return;
         }
-        var servestatic = Info['ext'] == '.md' ? false : true;
+        var servestatic = Info['ext'] != '.md';
 
         if (servestatic) {
             // serve static file directly.
@@ -103,6 +93,7 @@ var handler = function (req, res) {
         } else {
             data = filter_before(data); // execute filter to the file
             var htmlRawContent = marked(data);
+            htmlRawContent = filter_after(htmlRawContent); // execute filter to the file
             opts = {
                 show_header: false,
                 show_footer: false,

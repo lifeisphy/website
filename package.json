@@ -2,7 +2,9 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "less": "^4.3.0",
     "marked": "^15.0.8",
-    "marked-katex-extension": "^5.1.4"
+    "marked-katex-extension": "^5.1.4",
+    "open": "^10.1.2"
   }
 }
