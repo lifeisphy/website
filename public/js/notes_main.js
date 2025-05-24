@@ -25,7 +25,22 @@
       element.classList.toggle('collapsed');
     });
   })
-
+  document.addEventListener('DOMContentLoaded', () => {
+    const bgm = document.getElementById('bgm');
+    const bgmBtn = document.getElementById('bgmButton');
+    let isPlaying = false;
+    bgmBtn.addEventListener('click', () => {
+        if(isPlaying) {
+          bgm.pause();
+          isPlaying = false;
+          bgmBtn.textContent = 'start bgm';
+        } else {
+          bgm.play();
+          isPlaying = true;
+          bgmBtn.textContent = 'stop bgm';
+        }
+      });
+    });
   // content loading function
   document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', (event) => {
