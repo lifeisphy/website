@@ -1,32 +1,41 @@
-@colors: {
-  primary: #4CAF50;
-  brighter: #439946;
-  darker: #5fda63;
-  background: #f4f4f4;
-  text: #333;
-}
-
-@fontColors: {
-  primary: #f4f4f4;
-  background: black;
-}
+@import 'colors.less';
 
 .katex-html[aria-hidden="true"] {
   display: none !important;
 }
 
+body {
+  --bg-url: url('/pics/s-l1600.webp'); // 默认背景
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-url) no-repeat center center fixed;
+  background-size: cover;
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+}
+
 #content {
-  flex: 1; /* 占据剩余空间 */
-  padding: 20px 10px; /* 添加内边距 */
+  flex: 1;
+  /* 占据剩余空间 */
+  padding: 20px 10px;
+  /* 添加内边距 */
   font-size: 1.2em;
   line-height: 1.5em;
   margin: 0;
   background: @colors[background];
   color: @fontColors[background];
 
-  height: 100vh; /* 设置高度为视口高度 */
-  transition: all 0.3s ease; /* 平滑过渡效果 */
-  overflow-y: auto; /* 如果内容过长，允许滚动 */
+  height: 100vh;
+  /* 设置高度为视口高度 */
+  transition: all 0.3s ease;
+  /* 平滑过渡效果 */
+  overflow-y: auto;
+
+  /* 如果内容过长，允许滚动 */
   .time {
     font-size: 0.8em;
     font-family: monospace;
@@ -38,8 +47,10 @@ body {
   margin: 0;
   display: flex;
   flex-direction: row;
-  height: 100vh; /* 设置高度为视口高度 */
-  overflow: hidden; /* 隐藏溢出内容 */
+  height: 100vh;
+  /* 设置高度为视口高度 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
 }
 
 /* Sidebar container */
@@ -49,50 +60,57 @@ body {
     /* remove default underline */
     color: @fontColors[primary];
   }
-  flex: 0 0 250px;
+
+  flex: 0 0 30%;
   width: 250px;
   background-color: @colors[primary];
-  
+
   transition: all 0.3s ease;
   height: 100vh;
   overflow-y: auto;
-  padding: 5px;
-    .sidebar-item {
+  padding: 1px;
+
+  .sidebar-item {
     padding: 5px;
     cursor: pointer;
     border-radius: 5px;
-    }
-    .sidebar-item:hover {
-    background-color: color[brighter];
-    /* Slightly darker green */
-    }
 
-    .sidebar-subitems {
+    &:hover {
+      background-color: @colors[brighter];
+    }
+  }
+
+  .sidebar-subitems {
     margin-left: 20px;
     display: none;
-    }
-  
+  }
+
 }
 
 #sidebar.collapsed {
   flex: 0 0 0px;
-  /* transform: translateX(-100%); */
-  /* Hide sidebar */
+  display: hidden;
 }
 
 #toggleButton {
   flex: 0 0 40px;
   /* always on the top layer */
-  
+
   z-index: 1000;
   position: relative;
   height: 30px;
-  width: 30px;
+  width: 40px;
+  left: -5px;
   /* top: 0px;
   left: 255px; */
   background-color: @colors[primary];
   color: @fontColors[primary];
   border: none;
+
+  &:hover {
+    background-color: @colors[brighter];
+  }
+
   /* padding: 10px; */
   cursor: pointer;
   border-radius: 5px;
@@ -100,6 +118,68 @@ body {
   /* Smooth animation */
 }
 
+#toolbar-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: @colors[primary];
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: @colors[brighter];
+    /* Slightly darker green */
+  }
+
+}
 
 
+// media detection
+@media (max-width: 500px) {
+  #sidebar {
+    flex: 0 0 100vw;
+    overflow-y: auto;
+  }
 
+  #sidebar.collapsed {
+    flex: 0 0 0px;
+  }
+
+  #content {
+    padding: 5px;
+  }
+
+  #toggleButton {
+    position: fixed;
+    flex: unset;
+  }
+
+  #toggleButton:not(.collapsed) {
+    background-color: @colors[primary];
+    flex: unset;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    left: auto;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background-color: @colors[brighter];
+    }
+
+    /* Optionally, make the toggle button always visible */
+  }
+}

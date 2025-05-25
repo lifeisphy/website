@@ -13,6 +13,7 @@ const { options, default_index, katex_macros } = require("./options.js");
 // 打开template备用
 const { filter_before, filter_after } = require('./utils/mdFilter.js');
 const getTime = require('./utils/file_stat.js');
+const {bgmList, pictureList} = require('./utils/sources.js');
 // const template_string = fs.readFileSync(options.page_emplate, 'utf8');
 
 marked.use({
@@ -110,7 +111,16 @@ var handler = function (req, res) {
                         res.status(500).send('Error rendering template');
                         return;
                     }
-                    ejs.renderFile(options.page_template, { 'file_tree': file_tree, 'content': htmlContent }, function (err, str) {
+                    // console.log(`${pictureList},${bgmList}`);
+                    opts = { 
+                        'file_tree': file_tree,
+                        'content': htmlContent,
+                        'SpecifiedScreenWidth': 500,
+                        'bgmList': bgmList,
+                        'pictureList': pictureList,
+                    };
+                    ejs.renderFile(options.page_template, opts
+                        , function (err, str) {
                         if (err) {
                             console.error('Error rendering template:', err);
                             res.status(500).send('Error rendering template');

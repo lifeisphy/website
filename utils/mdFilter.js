@@ -37,9 +37,9 @@ function genTree(str ,begin, end){
 function filter_before(md,options){
 // 处理markdown文件, before converting to html
     
-    md = md.replaceAll(/\\fcolorbox\{(.*?)\}\{(.*?)\}\{(.*?)\}/g, function(match, p1, p2, p3) {
-        return '\\fcolorbox{' + p1 + '}{white}{' + p3 + '}';
-    });
+    // md = md.replaceAll(/\\fcolorbox\{(.*?)\}\{(.*?)\}\{(.*?)\}/g, function(match, p1, p2, p3) {
+    //     return '\\fcolorbox{' + p1 + '}{white}{' + p3 + '}';
+    // });
     if(options !== undefined && options.zhihu){
         const {transform_zhihu_type} = require('./zhihu.js');
         md = transform_zhihu_type(md);

@@ -1,14 +1,4 @@
-var beginSet = ['$','`'];
-var endSet = [ '$' , '`'];
-function endLabelof(label){
-    return endSet[beginSet.indexOf(label)];
-}
-function NextMove(beginSet, end, lvl, label){
-    if(lvl === 0){
-        return [['$'], endLabelof(label)];
-    }
-    return [beginSet, endLabelof(label)];
-}
+
 function get_min_element(begin_idx){
     var min = 10000000;
     var label = undefined;
@@ -24,13 +14,21 @@ function get_min_element(begin_idx){
         return [min, label];
     }
 }
-function genTree(str ,beginSet, end, lvl){
+function genTree(str ,beginSet, end, lvl,NextMove){
     const tree =[];
     let pos = 0;
     console.log(`str: ${str}, strSLC:${str.slice(pos)}, beginSet: ${beginSet}, end: ${end} `);
     while(pos < str.length){
         console.log(`pos: ${pos} lvl:${lvl} ${str.slice(pos)}`);
         // get minimum index of beginSet
+        res = []
+        for(var i = 0; i < beginSet.length; i++){
+            if(beginSet[i] instanceof RegExp){
+                
+            }else if(typeof beginSet[i] === 'string'){
+
+            }
+        }
         const begin_idx = beginSet.map(element => str.indexOf(element, pos));
         console.log(`begin_idx: ${begin_idx}`);
         const [begin_idx_min, label] = get_min_element(begin_idx); // using nearest label.
@@ -77,5 +75,25 @@ function genTree(str ,beginSet, end, lvl){
     // process.exit(1);
     return tree;
 }
+function genTree_entry(str,NextMove){
+    return genTree(str, ['$', '$$'], undefined, 0,NextMove);
+}
 
-console.log(genTree('$a`b`$`c`', beginSet, undefined,0));
+var beginSet = ['$','`'];
+var endSet = [ '$' , '`'];
+function endLabelof(label){
+    return endSet[beginSet.indexOf(label)];
+}
+function NextMove(beginSet, end, lvl, label){
+    // returns: the next string set that can begin with, and the end label of current level.
+    // parames: 
+    // beginSet: the current character begin set
+    // endSet: the current end string
+    // lvl: tree depth level
+    // label: the begin label that currently meets
+    if(lvl === 0){
+        return [['$'], endLabelof(label)];
+    }
+    return [beginSet, endLabelof(label)];
+}
+console.log(genTree_entry(str, NextMove));
