@@ -45,7 +45,6 @@ function parseRequest(req) {
 }
 
 var handler = function (req, res) {
-    // console.log(`${req.baseUrl},${req.url},${req.path}`);
     const Info = parseRequest(req);
     console.log(Info);
     var fs_path = path.join(options.md_base, Info['pathname']);
@@ -74,7 +73,6 @@ var handler = function (req, res) {
         }
     }
     console.log(`fs_path: ${fs_path}`);
-    // var data = String();
     fs.readFile(fs_path, 'utf8', (err, data) => {
         if (err) {
             res.status(404).send('File Not Found: ' + fs_path);
@@ -140,18 +138,7 @@ var handler = function (req, res) {
 };
 
 router.get('/', handler);
-router.get('/files', function (req, res) {
-    res.send(ftree.file_tree);
-});
 router.get('/*pathlist', handler);
 // Home page route
-// router.get("/", function (req, res) {
-//   res.send("Wiki home page");
-// });
-
-// About page route
-// router.get("/about", function (req, res) {
-//   res.send("About this wiki");
-// });
 
 module.exports = router;

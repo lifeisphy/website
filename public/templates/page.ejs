@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Notes</title>
+  <link rel="icon" type="image/png" href="/favicon.jpg">
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"> -->
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/content.css">
@@ -17,11 +18,9 @@
     <% function renderEntries(entries) { %>
       <% entries.forEach(function(entry) { %>
         <% if (entry.isfile) { %>
-          <div class="sidebar-item">
             <a href="<%= entry.path %>" class="sidebar-item" data-partial="true">
               <%= entry.filename.split('.md')[0] %>
             </a>
-          </div>
           <% } else { %>
             <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">
               <a href="<%= entry.path %>" data-partial="true">📁 <%= entry.directory %></a>
@@ -33,12 +32,7 @@
               <% }); %>
                 <% } %>
 
-                  <% renderEntries(file_tree); %> <!-- Initial call -->
-
-                    <div id="item1" class="sidebar-subitems">
-                      <div class="sidebar-item"> File 1.1</div>
-                      <div class="sidebar-item"> File 1.2</div>
-                    </div>
+    <% renderEntries(file_tree); %> <!-- Initial call -->
   </div>
   <button id="toggleButton">≡</button>
   <div id="content">
@@ -46,18 +40,23 @@
   </div>
   <button id="toolbar-button">🔧</button>
   <div id="toolbar">
-    <div class="toolbar-section">
+    <div class="toolbar-section toolbar-thm">
       <span>Fontsize</span>
       <button id="fontsize-plus" class="toolbar-btn">+</button>
       <button id="fontsize-minus" class="toolbar-btn">-</button>
     </div>
-    <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button>
-    <div class="toolbar-section">
-      <label id="bgmName"></label><br>
-      <button id="bgmChangeButton" class="toolbar-btn">🎲</button>
-      <button id="prevBGMButton" class="toolbar-btn">⏮</button>
-      <button id="bgmPlayButton" class="toolbar-btn">▶</button>
-      <button id="nextBGMButton" class="toolbar-btn">⏭</button>
+
+    <div id="toolbar-pic">
+      <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button>
+    </div>
+    <div id="toolbar-music">
+      <label id="bgmName" class="toolbar-thm"></label>
+      <div class="toolbar-section">
+        <button id="bgmChangeButton" class="toolbar-btn">🎲</button>
+        <button id="prevBGMButton" class="toolbar-btn">⏮</button>
+        <button id="bgmPlayButton" class="toolbar-btn">▶</button>
+        <button id="nextBGMButton" class="toolbar-btn">⏭</button>
+      </div>
     </div>
   </div>
   <audio id="bgm" loop>

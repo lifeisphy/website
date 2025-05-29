@@ -133,10 +133,17 @@ window.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   // ... 你的其它初始化代码 ...
   changePicButton.addEventListener('click', function() {
-  const picList = pictureList.map(pic => pic.replace(/\\/g, '/'));
-  const randomIndex = Math.floor(Math.random() * picList.length);
-  const selectedPic = picList[randomIndex];
-  document.body.style.setProperty('--bg-url', `url('${selectedPic}')`);
+  
+  const isPortrait = window.innerHeight > window.innerWidth;
+  const filteredList = pictureList.filter(pic => {
+    if(!pic.width || !pic.height) return true;
+    if(isPortrait) return pic.height >= pic.width; // 竖屏时选择高宽比大于1的图片
+    else return pic.width >= pic.height; // 横屏时选择高宽比大于1的图片
+  }).map(pic => pic.path.replace(/\\/g, '/'));
+
+  const randomIndex = Math.floor(Math.random() * filteredList.length);
+  const selectedPicPath = filteredList[randomIndex];
+  document.body.style.setProperty('--bg-url', `url('${selectedPicPath}')`);
 });
   toolbarButton.addEventListener('click', function(e) {
     e.stopPropagation();

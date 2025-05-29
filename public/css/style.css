@@ -2,7 +2,7 @@
   display: none !important;
 }
 body {
-  --bg-url: url('/pics/s-l1600.webp');
+  --bg-url: url('/pics/venti.jpg');
 }
 body::before {
   content: "";
@@ -61,6 +61,8 @@ body {
 #sidebar a {
   text-decoration: none;
   /* remove default underline */
+  /* set to block */
+  display: block;
   color: #f4f4f4;
 }
 #sidebar .sidebar-item {
