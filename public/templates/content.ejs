@@ -1,6 +1,18 @@
 <% if(show_time) { %>
   <div class="time">Created: <%- t.create_time  || 'undefined' %></div><div class="time">Updated: <%- t.alter_time || 'undefined' %></div>
+  
 <% } %>
+
+<% if (tags && tags.length > 0) { %>
+<div class="tags">
+  Tags: 
+  <% tags.forEach(function(tag, idx) { %>
+    <a href="<%- tagsurl %>/<%- encodeURIComponent(tag) %>" data-partial="true"><%- tag %></a>
+    <%= idx < tags.length - 1 ? ', ' : '' %>
+  <% }) %>
+</div>
+<% } %>
+
 <% if(show_header) { %>
   <div class="header">
   </div>

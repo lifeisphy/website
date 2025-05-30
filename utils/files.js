@@ -1,6 +1,8 @@
 // [{'isfile':true,'filename':'README.md','path':'/README.md'},{'isfile':false,'directory':'1','path':'/1','children':[...]}]
 const fs = require('fs');
 const path = require('path');
+const matter = require('gray-matter');
+const { type } = require('os');
 const options = require("../options.js").options;
 const base64 = (str) => {
     return Buffer.from(str).toString('base64');
@@ -21,6 +23,9 @@ function readFileTree(pathname){
             newEnt.children = readFileTree(file_path);
         }else{
             newEnt.filename = file;
+            const data = fs.readFileSync(path.join(options.md_base, file_path), 'utf8');
+            newEnt.frontmatter = matter(data).data;
+            // const frontmatter = matter(data);
         }
         subtree.push(newEnt);
     });
@@ -37,7 +42,51 @@ function printFileTree(tree){
         }
     });
 }
+function summaryTags(fileTree){
+    var tags = {};
+    fileTree.forEach(element => {
+        if(element.isfile){
+            if(element.frontmatter && element.frontmatter && element.frontmatter.tags){
+                // Check if tags is an array or a string
+                let mdtags = element.frontmatter.tags;
+                if(mdtags instanceof Array){
+                    mdtags.forEach(tag => {
+                        if(!tags[tag]){ // if tag does not exist, create it
+                            tags[tag] = [];
+                        }
+                        tags[tag].push(element.path);// Add the file path to the tag
+                    });
+                }else if(typeof mdtags === 'string'){
+                    if(!tags[mdtags]){ // if tag does not exist, create it
+                        tags[mdtags] = [];
+                    }
+                    tags[mdtags].push(element.path);// Add the file path to the tag
+                }
+                // console.log(tags);
+            }
+        } else {
+            if(element.children){
+                var childTags = summaryTags(element.children);
+                for(var tag in childTags){
+                    if(!tags[tag]){
+                        tags[tag] = [];
+                    }
+                    tags[tag] = tags[tag].concat(childTags[tag]);
+                }
+            }
+        }
+    });
+    return tags;
+}
+function summaryTags_entry(file_tree){
+    var tags = summaryTags(file_tree);
+    console.log('Tags Summary:');
+    for(var tag in tags){
+        console.log(`${tag}: ${tags[tag].length} files`);
+        console.log(tags[tag]);
+    }
+    return tags;
+}
 file_tree = readFileTree('/');
-// console.log(file_tree,file_tree[0].children);
-// printFileTree(file_tree);
-module.exports = { readFileTree, printFileTree , file_tree };
+tags = summaryTags_entry(file_tree);
+module.exports = { readFileTree, printFileTree , file_tree, tags };

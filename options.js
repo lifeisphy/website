@@ -4,6 +4,7 @@ options = {
     'md_base': 'public/md',
     'content_template': 'public/templates/content.ejs',
     'page_template': 'public/templates/page.ejs',
+    'tags_template': 'public/templates/tags.ejs',
 }
 default_index = ['index.md', 'README.md'];
 katex_macros = {

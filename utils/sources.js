@@ -9,14 +9,14 @@ pictureList = fs.readdirSync('public/pics')
     .filter(file => file.endsWith('.jpg') || file.endsWith('.png') || file.endsWith('.jpeg') || file.endsWith('.webp'))
     // .map(file => file.replace('\\','/'))
     .map(file => {
-        var width,height, dimensions;
+        var width, height, dimensions;
         const fsPath = path.join('public/pics', file);
         try {
             const buffer = fs.readFileSync(fsPath);
-            const dimensions = imageSize(buffer);    
+            const dimensions = imageSize(buffer);
             width = dimensions.width;
             height = dimensions.height;
-        } catch (e){
+        } catch (e) {
             console.log(e);
             width = undefined;
             height = undefined;
@@ -28,4 +28,4 @@ pictureList = fs.readdirSync('public/pics')
         }
     });
 
-module.exports = {bgmList,pictureList};
+module.exports = { bgmList, pictureList };
