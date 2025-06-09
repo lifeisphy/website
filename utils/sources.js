@@ -1,10 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 const { imageSize } = require('image-size')
+if(!fs.existsSync('public/pics')){
+    fs.mkdirSync('public/pics', { recursive: true });
+}
+if(!fs.existsSync('public/audios')){
+    fs.mkdirSync('public/audios', { recursive: true });
+}
 bgmList = fs.readdirSync('public/audios')
     .filter(file => file.endsWith('.mp3') || file.endsWith('.wav') || file.endsWith('.flac'))
     // .map(file => file.replace('\\','/'))
     .map(file => path.join('/audios/', file));
+
+
 pictureList = fs.readdirSync('public/pics')
     .filter(file => file.endsWith('.jpg') || file.endsWith('.png') || file.endsWith('.jpeg') || file.endsWith('.webp'))
     // .map(file => file.replace('\\','/'))

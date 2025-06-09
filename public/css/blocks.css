@@ -1,0 +1,129 @@
+.proof-block {
+  position: relative;
+}
+.proof-block::after {
+  content: "";
+  position: absolute;
+  right: 1em;
+  bottom: 0.7em;
+  width: 0.9em;
+  height: 0.9em;
+  background: #6366f1;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.15);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.theorem-block {
+  border-left: 4px solid rgba(59, 130, 246, 0.6);
+  background: rgba(234, 243, 255, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.theorem-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(59, 130, 246, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.proposition-block {
+  border-left: 4px solid rgba(16, 185, 129, 0.6);
+  background: rgba(230, 249, 242, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.proposition-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(16, 185, 129, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.definition-block {
+  border-left: 4px solid rgba(230, 178, 87, 0.6);
+  background: rgba(252, 248, 242, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.definition-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(230, 178, 87, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.proof-block {
+  border-left: 4px solid rgba(99, 102, 241, 0.6);
+  background: rgba(243, 244, 253, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+  font-style: italic;
+}
+.proof-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(99, 102, 241, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.lemma-block {
+  border-left: 4px solid rgba(244, 63, 94, 0.6);
+  background: rgba(255, 238, 242, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.lemma-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(244, 63, 94, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.remarks-block {
+  border-left: 4px solid rgba(167, 139, 250, 0.6);
+  background: rgba(243, 240, 255, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.remarks-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(167, 139, 250, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}
+.example-block {
+  border-left: 4px solid rgba(234, 179, 8, 0.6);
+  background: rgba(255, 250, 235, 0.3);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 6px;
+}
+.example-block::before {
+  content: attr(name);
+  position: relative;
+  top: -0.8em;
+  left: -1.2em;
+  background-color: rgba(234, 179, 8, 0.6);
+  border-radius: 4px 4px 4px 0;
+  padding: 3px 3px;
+}

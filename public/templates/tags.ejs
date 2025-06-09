@@ -1,6 +1,6 @@
 <h2>Tag: <%= tag %></h2>
 <style>
-  ul.tag-list {
+  /* ul.tag-list {
   padding-left: 0;
   margin: 0;
   list-style: none;
@@ -9,8 +9,30 @@ ul.tag-list li.tag-item {
   margin-bottom: 10px;
   padding: 6px 10px;
   border-bottom: 1px solid #eee;
+  flex-direction: column;
+  display: flex;
+} 
+*/
+ul.tag-list li.tag-item {
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1.5px solid #e0e7ef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
   display: flex;
   flex-direction: column;
+}
+
+ul.tag-list li.tag-item:hover {
+  background: #f8fbff;
+  border-color: #b6d4fe;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.10);
+}
+.preview {
+  display: inline-block;
+  white-space: nowrap; /* 不换行，超出会横向滚动 */
 }
 ul.tag-list a {
   font-weight: bold;
@@ -23,14 +45,15 @@ ul.tag-list div {
   font-size: 12px;
   color: #555;
   line-height: 1.4;
-  max-height: 48px;
-  overflow: hidden;
+  max-height: 60px; 
+  overflow  : hidden;
 }
 
 ul.tag-list {
-  math,p,ul,ol,li {
+  * {
     display: inline;
   }
+  br { display: none;}
 }
 </style>
 <ul class="tag-list">
@@ -38,7 +61,7 @@ ul.tag-list {
        const fileName = post.split('/').pop();
   %>
     <li class="tag-item">
-      <a href="<%= post %>"><%= fileName %></a> <div><%- summaries[post] %></div>    
+      <a href="<%= post %>"><%= fileName %></a> <div class="preview"><%- summaries[post] %></div>    
     </li>
   
   <% }) %>

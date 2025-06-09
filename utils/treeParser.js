@@ -41,7 +41,7 @@ function genTree(str ,beginSet, end, lvl,NextMove){
                 }
             }
         }
-        
+        console.log(res);
         // choose the minimum start index(2) and if the same choose the maximum stop index(3).
 
         var begin_idx = -1;
@@ -58,7 +58,15 @@ function genTree(str ,beginSet, end, lvl,NextMove){
         // console.log(`begin_indices: ${begin_indices}`);
         // const [begin_idx, label] = get_min_element(beginSet,begin_indices); // using nearest label.
         var label = begin_idx === -1 ? undefined : res[begin_idx][1];
-        const endIdx = str.indexOf(end, pos);
+        if(end instanceof RegExp){
+            var endIdx = str.slice(pos).search(end);
+            if(endIdx !== -1){
+                endIdx += pos; // adjust the index to the original string
+            }
+        }else if(typeof end === 'string'){
+            endIdx = str.indexOf(end, pos);
+        }
+        // const endIdx = str.indexOf(end, pos);
         console.log(`begin_idx: ${begin_idx}, label: ${label},end: ${end}, endIdx: ${endIdx}`);
         if(endIdx === -1 && begin_idx === -1){
             console.error('no end tag');
@@ -126,4 +134,6 @@ function NextMove(beginSet, end, lvl, label){
     }
     return [beginSet, endLabelof(label)];
 }
+var fs = require('fs');
+str = fs.readFileSync('temp/2.md', 'utf8');
 console.log(genTree_entry(str, NextMove));

@@ -1,14 +1,7 @@
 const katex = require('katex');
 const marked = require('marked');
 
-module.exports = function (options) {
-    return {
-        extensions: [
-            inlineKatex(options),
-            blockKatex(options)
-        ]
-    }
-}
+
 
 function inlineKatex(options) {
     return {
@@ -57,3 +50,4 @@ function blockKatex(options) {
         }
     }
 }
+module.exports = {inlineKatex, blockKatex};

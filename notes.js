@@ -4,30 +4,43 @@ const path = require('path');
 const markedKatex = require("marked-katex-extension");
 const express = require("express");
 const router = express.Router();
-const katexExtension = require("./utils/katex_ext.ts");
+const {inlineKatex, blockKatex} = require("./utils/katex_ext.ts");
 const {ftree, tags }= require("./utils/files.js");
 const ejs = require("ejs");
 const matter = require('gray-matter');
-const { options, default_index, katex_macros } = require("./options.js");
+const { options, default_index, katex_macros, tag_options } = require("./options.js");
+const {BlockExtensionGenerator, theoremBlockExtension} = require("./utils/block_ext.ts");
 // Serve static files (CSS, JS, etc.)
 // 读取文件树为json备用
 // 打开template备用
 const { filter_before, filter_after } = require('./utils/mdFilter.js');
 const getTime = require('./utils/file_stat.js');
 const {bgmList, pictureList} = require('./utils/sources.js');
+const { render } = require('less');
 // const template_string = fs.readFileSync(options.page_emplate, 'utf8');
 console.log(ftree,tags);
+opt = { throwOnError: false, macros: katex_macros ,strict: false};
+
 marked.use({
-    gfm: true,
-    breaks: true,
-})
-
-
-
-marked.use(katexExtension({
-    throwOnError: false,
-    macros: katex_macros
-}));
+  gfm: true,
+  breaks: true,
+  extensions: [
+    BlockExtensionGenerator('Definition','red'),
+                // theoremBlockExtension,
+                BlockExtensionGenerator('Theorem','blue'),
+                BlockExtensionGenerator('Proposition','purple'),
+                BlockExtensionGenerator('Proof','yellow'),
+                BlockExtensionGenerator('Remarks','aqua'),
+                inlineKatex(opt), 
+                blockKatex(opt)],
+});
+// marked.use(
+//     {extensions: [ BlockExtension]}
+// );
+// marked.use(katexExtension({
+//     throwOnError: false,
+//     macros: katex_macros
+// }));
 
 function parseRequest(req) {
     console.log(`Request path: ${req.path}`);
@@ -45,7 +58,26 @@ function parseRequest(req) {
         ext: isPath ? undefined : path.extname(pathname),
     };
 }
-
+function renderFullPage(content){
+    // 渲染完整页面
+    opts = { 
+        'file_tree': file_tree,
+        'content': content,
+        'SpecifiedScreenWidth': 500,
+        'bgmList': bgmList,
+        'pictureList': pictureList,
+    };
+    var ret = ejs.renderFile(options.page_template,opts);
+    return ret;
+    // var ret = ejs.renderFile(options.page_template, opts
+        // , 
+        // function (err, str) {
+        // if (err) {
+        //     console.error('Error rendering template:', err);
+        //     return 'Error rendering template';
+        // }
+    // );
+}
 var handler = function (req, res) {
     const Info = parseRequest(req);
     console.log(Info);
@@ -111,33 +143,21 @@ var handler = function (req, res) {
                 content: htmlRawContent,
             };
             ejs.renderFile(options.content_template, opts, function (err, htmlContent) {
+                if (err) {
+                    console.error('Error rendering template:', err);
+                    res.status(500).send('Error rendering template');
+                    return;
+                }
                 if (!Info['partial']) {
                     // 渲染完整页面
-                    if (err) {
-                        console.error('Error rendering template:', err);
-                        res.status(500).send('Error rendering template');
-                        return;
-                    }
-                    // console.log(`${pictureList},${bgmList}`);
-                    opts = { 
-                        'file_tree': file_tree,
-                        'content': htmlContent,
-                        'SpecifiedScreenWidth': 500,
-                        'bgmList': bgmList,
-                        'pictureList': pictureList,
-                    };
-                    ejs.renderFile(options.page_template, opts
-                        , function (err, str) {
-                        if (err) {
-                            console.error('Error rendering template:', err);
-                            res.status(500).send('Error rendering template');
-                            return;
-                        }
-                        res.send(str);
+                    renderFullPage(htmlContent).then((result) => {
+                        res.send(result);
                     });
+                    return;
                 } else {
                     // 渲染局部页面
                     res.send(htmlContent);
+                    return;
                 }
             });
         }
@@ -147,8 +167,9 @@ var handler = function (req, res) {
 };
 
 router.get('/tags/:tag', (req, res) => {
+    const Info = parseRequest(req);
     const tag = req.params.tag;
-    // 假设你有所有文章的元数据列表 allPosts
+    
     if( !tags[tag]) {
         res.status(404).send('Tag Not Found: ' + tag);
         return;
@@ -158,9 +179,10 @@ router.get('/tags/:tag', (req, res) => {
         posts.forEach(post => {
             // convert webpath to fs path
             post_path = post.replace(options.site_root, options.md_base);
+            console.log(`post_path: ${post_path}`);
             const content = fs.readFileSync(post_path, 'utf8');
             const parsed = matter(content);
-            summaries[post] = marked(parsed.content.trim().slice(0,100) + '...');
+            summaries[post] = marked(parsed.content.trim().slice(0,tag_options.truncationLength) + '...');
         });
         
         ejs.renderFile(options.tags_template, {
@@ -173,7 +195,13 @@ router.get('/tags/:tag', (req, res) => {
                 res.status(500).send('Error rendering template');
                 return;
             }
-            res.send(str);
+            if(! Info['partial']){
+                renderFullPage(str).then((result) => {
+                    res.send(result);
+                });
+            }else{
+                res.send(str);
+            }
         });
     }
 });

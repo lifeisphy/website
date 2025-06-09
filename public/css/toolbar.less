@@ -26,11 +26,12 @@
 }
 #toolbar {
   position: fixed;
-  top: 0;
+  bottom: 0;
   display: hidden;
   right: -340px; // 隐藏
   width: 300px;
-  height: 100vh;
+  height: 30vh;
+  border-radius: 9px;
   background: @colors[primary];
   box-shadow: -2px 0 8px rgba(0,0,0,0.15);
   z-index: 2000;
@@ -39,6 +40,22 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+.toolbar-color-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  padding: 2px;
+  margin-top: 9px;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    border-color: #888;
+  }
 }
 #toolbar.open {
   right: 0;
@@ -51,6 +68,9 @@
 }
 .toolbar-thm {
   color: @fontColors[primary];
+  // text-align: center;
+  padding: 6px 12px;
+  margin: 0 2px;
 }
 .toolbar-btn {
   background: @colors[primary];

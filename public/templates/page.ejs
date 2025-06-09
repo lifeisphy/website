@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/content.css">
   <link rel="stylesheet" href="/css/toolbar.css">
+  <link rel="stylesheet" href="/css/blocks.css">
 </head>
 
 <body>
@@ -46,8 +47,14 @@
       <button id="fontsize-minus" class="toolbar-btn">-</button>
     </div>
 
-    <div id="toolbar-pic">
-      <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button>
+    <div id="toolbar-background" class="toolbar-thm">
+      <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button><br>
+      <!--  <span class="toolbar-thm">pure background color:</span><br> --> 
+      <button class="toolbar-color-btn" style="background:#fff;" data-bg="#fff"></button>
+      <button class="toolbar-color-btn" style="background:#222;" data-bg="#222"></button>
+      <button class="toolbar-color-btn" style="background:#f4f4f4;" data-bg="#f4f4f4"></button>
+      <button class="toolbar-color-btn" style="background:#4CAF50;" data-bg="#4CAF50"></button>
+      <button class="toolbar-color-btn" style="background:#2196F3;" data-bg="#2196F3"></button>
     </div>
     <div id="toolbar-music">
       <label id="bgmName" class="toolbar-thm"></label>

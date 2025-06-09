@@ -1,0 +1,47 @@
+// 定义一个 mixin 函数
+.block-style(@class, @border, @bg, @extra: {}) {
+  .@{class} {
+    border-left: 4px solid @border;
+    background: @bg;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    border-radius: 6px;
+    @extra();
+    &::before {
+      content: attr(name);  // from its name property
+      position: relative;
+      top: -0.8em;
+      left: -1.2em;
+      background-color: @border;
+      border-radius: 4px 4px 4px 0;
+      padding: 3px 3px;
+    }
+  }
+}
+.proof-block {
+  position: relative; // 让 ::after 以此为参考
+  &::after {
+    content: "";
+    position: absolute;
+    right: 1em;
+    bottom: 0.7em;
+    width: 0.9em;
+    height: 0.9em;
+    background: #6366f1; // 可与主色一致或自定义
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(99,102,241,0.15);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+}
+@transparency: 0.6;
+@bg-transparency: 0.3;
+.block-style(theorem-block,      rgba(59,130,246,@transparency), rgba(234,243,255,@bg-transparency));
+.block-style(proposition-block,  rgba(16,185,129,@transparency), rgba(230,249,242,@bg-transparency));
+.block-style(definition-block,   rgba(230,178,87,@transparency), rgba(252,248,242,@bg-transparency));
+.block-style(proof-block,        rgba(99,102,241,@transparency), rgba(243,244,253,@bg-transparency), {
+  font-style: italic;
+});
+.block-style(lemma-block,        rgba(244,63,94,@transparency),  rgba(255,238,242,@bg-transparency));
+.block-style(remarks-block,      rgba(167,139,250,@transparency), rgba(243,240,255,@bg-transparency));
+.block-style(example-block,      rgba(234,179,8,@transparency),    rgba(255,250,235,@bg-transparency));

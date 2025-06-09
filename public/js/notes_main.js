@@ -55,6 +55,10 @@ function fontsize_minus() {
 }
 function roll_bgm() {
   // randomly select a BGM from the list
+  if(bgmList.length === 0) {
+    console.warn('BGM list is empty. Please check your configuration.');
+    return;
+  }
   const randomIndex = Math.floor(Math.random() * bgmList.length);
   const selectedBgm = bgmList[randomIndex];
   bgm.src = selectedBgm; // Set the BGM source
@@ -65,7 +69,7 @@ function roll_bgm() {
 }
 document.addEventListener('DOMContentLoaded', () => {
   roll_bgm();
-
+  roll_picture();
   bgmPlayButton.addEventListener('click', start_stop_bgm);
   bgmChangeBtn.addEventListener('click', roll_bgm);
   document.getElementById('fontsize-plus').addEventListener('click', fontsize_plus);
@@ -130,10 +134,11 @@ window.addEventListener('DOMContentLoaded', () => {
     toggle();
   }
 });
-document.addEventListener('DOMContentLoaded', () => {
-  // ... 你的其它初始化代码 ...
-  changePicButton.addEventListener('click', function() {
-  
+function roll_picture() {
+  if(!pictureList || pictureList.length === 0) {
+    console.warn('Picture list is empty. Please check your configuration.');
+    return;
+  }
   const isPortrait = window.innerHeight > window.innerWidth;
   const filteredList = pictureList.filter(pic => {
     if(!pic.width || !pic.height) return true;
@@ -144,7 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const randomIndex = Math.floor(Math.random() * filteredList.length);
   const selectedPicPath = filteredList[randomIndex];
   document.body.style.setProperty('--bg-url', `url('${selectedPicPath}')`);
-});
+  // remove the background color
+  document.body.style.backgroundColor = 'transparent';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // ... 你的其它初始化代码 ...
+  changePicButton.addEventListener('click', roll_picture);
   toolbarButton.addEventListener('click', function(e) {
     e.stopPropagation();
     toolbar.classList.toggle('open');
@@ -159,5 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ) {
       toolbar.classList.remove('open');
     }
+  });
+});
+document.querySelectorAll('.toolbar-color-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    // remove background picture
+    document.body.style.setProperty('--bg-url', 'none');
+    document.body.style.background = this.getAttribute('data-bg');
   });
 });

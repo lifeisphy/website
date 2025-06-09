@@ -36,7 +36,9 @@ function genTree(str ,begin, end){
 }
 function filter_before(md,options){
 // 处理markdown文件, before converting to html
-    
+    // md = md.replaceAll(/\$\\fcolorbox\{(.*?)\}\{(.*?)\}\{Definition(.*?)\}\$([\w\W]*?)\$\\fcolorbox\{(.*?)\}\{(.*?)\}\{End Definition\}\$/g, function(match,p1,p2,p3,content,p4,p5,p6){
+    //     return `<div class="Def"> ${filter_before(content)} </div>`;
+    // });
     // md = md.replaceAll(/\\fcolorbox\{(.*?)\}\{(.*?)\}\{(.*?)\}/g, function(match, p1, p2, p3) {
     //     return '\\fcolorbox{' + p1 + '}{white}{' + p3 + '}';
     // });

@@ -62,7 +62,8 @@ body {
   }
 
   flex: 0 0 30%;
-  width: 250px;
+  width: 30%;
+  max-width: 300px;
   background-color: @colors[primary];
 
   transition: all 0.3s ease;
@@ -74,7 +75,7 @@ body {
     padding: 5px;
     cursor: pointer;
     border-radius: 5px;
-
+    display: block;
     &:hover {
       background-color: @colors[brighter];
     }
@@ -149,6 +150,7 @@ body {
 @media (max-width: 500px) {
   #sidebar {
     flex: 0 0 100vw;
+    max-width: inherit;
     overflow-y: auto;
   }
 

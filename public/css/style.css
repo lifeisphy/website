@@ -33,6 +33,12 @@ body::before {
   /* 平滑过渡效果 */
   overflow-y: auto;
   /* 如果内容过长，允许滚动 */
+  img {
+    display: block;
+    margin: 0 auto;
+    max-width: 50%;
+    height: auto;
+  }
 }
 #content .time {
   font-size: 0.8em;
@@ -51,7 +57,8 @@ body {
 /* Sidebar container */
 #sidebar {
   flex: 0 0 30%;
-  width: 250px;
+  width: 30%;
+  max-width: 300px;
   background-color: #4CAF50;
   transition: all 0.3s ease;
   height: 100vh;
@@ -61,14 +68,13 @@ body {
 #sidebar a {
   text-decoration: none;
   /* remove default underline */
-  /* set to block */
-  display: block;
   color: #f4f4f4;
 }
 #sidebar .sidebar-item {
   padding: 5px;
   cursor: pointer;
   border-radius: 5px;
+  display: block;
 }
 #sidebar .sidebar-item:hover {
   background-color: #5fda63;
@@ -129,6 +135,7 @@ body {
 @media (max-width: 500px) {
   #sidebar {
     flex: 0 0 100vw;
+    max-width: inherit;
     overflow-y: auto;
   }
   #sidebar.collapsed {
