@@ -1,68 +1,9 @@
 <h2>Tag: <%= tag %></h2>
-<style>
-  /* ul.tag-list {
-  padding-left: 0;
-  margin: 0;
-  list-style: none;
-}
-ul.tag-list li.tag-item {
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  border-bottom: 1px solid #eee;
-  flex-direction: column;
-  display: flex;
-} 
-*/
-ul.tag-list li.tag-item {
-  margin-bottom: 16px;
-  padding: 14px 18px;
-  border: 1.5px solid #e0e7ef;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-
-ul.tag-list li.tag-item:hover {
-  background: #f8fbff;
-  border-color: #b6d4fe;
-  box-shadow: 0 4px 16px rgba(33,150,243,0.10);
-}
-.preview {
-  display: inline-block;
-  white-space: nowrap; /* 不换行，超出会横向滚动 */
-}
-ul.tag-list a {
-  font-weight: bold;
-  font-size: 15px;
-  margin-bottom: 2px;
-  text-decoration: none;
-  color: #3366cc;
-}
-ul.tag-list div {
-  font-size: 12px;
-  color: #555;
-  line-height: 1.4;
-  max-height: 60px; 
-  overflow  : hidden;
-}
-
-ul.tag-list {
-  * {
-    display: inline;
-  }
-  br { display: none;}
-}
-</style>
-<ul class="tag-list">
+<ul class="passage-list">
   <% posts.forEach(function(post) { 
-       const fileName = post.split('/').pop();
   %>
-    <li class="tag-item">
-      <a href="<%= post %>"><%= fileName %></a> <div class="preview"><%- summaries[post] %></div>    
-    </li>
-  
+    <li class="passage-item">
+      <a href="<%= post.site_path %>" data-partial="true"><%= post.filename %></a> <div class="preview"><%- summaries[post.site_path] %></div>    
+    </li>  
   <% }) %>
 </ul>

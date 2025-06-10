@@ -7,7 +7,7 @@ function getTime(path){
     stats = fs.statSync(path);
     return {
         alter_time: formatTime(stats.mtime), // modify time
-        create_time: formatTime(stats.ctime), // change time
+        create_time: formatTime(stats.birthtime), // birth time
     };
 
 }

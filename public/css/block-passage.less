@@ -1,0 +1,56 @@
+  /* ul.passage-list {
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+}
+ul.passage-list li.passage-item {
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+  flex-direction: column;
+  display: flex;
+} 
+*/
+ul.passage-list li.passage-item {
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1.5px solid #e0e7ef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  display: flex;
+  opacity: 0.7;
+  flex-direction: column;
+}
+
+ul.passage-list li.passage-item:hover {
+  background: #f8fbff;
+  border-color: #b6d4fe;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.10);
+}
+.preview {
+  display: inline-block;
+  white-space: nowrap; /* 不换行，超出会横向滚动 */
+}
+ul.passage-list a {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 2px;
+  text-decoration: none;
+  color: #3366cc;
+}
+ul.passage-list div {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.4;
+  max-height: 60px; 
+  overflow  : hidden;
+}
+
+ul.passage-list {
+  * {
+    display: inline;
+  }
+  br { display: none;}
+}

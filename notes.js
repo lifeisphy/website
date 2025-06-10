@@ -5,7 +5,7 @@ const markedKatex = require("marked-katex-extension");
 const express = require("express");
 const router = express.Router();
 const {inlineKatex, blockKatex} = require("./utils/katex_ext.ts");
-const {ftree, tags }= require("./utils/files.js");
+const { tags, file_tree, findInFileTree }= require("./utils/files.js");
 const ejs = require("ejs");
 const matter = require('gray-matter');
 const { options, default_index, katex_macros, tag_options } = require("./options.js");
@@ -18,7 +18,8 @@ const getTime = require('./utils/file_stat.js');
 const {bgmList, pictureList} = require('./utils/sources.js');
 const { render } = require('less');
 // const template_string = fs.readFileSync(options.page_emplate, 'utf8');
-console.log(ftree,tags);
+// console.log(ftree,tags);
+console.log(file_tree);
 opt = { throwOnError: false, macros: katex_macros ,strict: false};
 
 marked.use({
@@ -91,7 +92,10 @@ var handler = function (req, res) {
             res.status(404).send('Not a directory: ' + Info['pathname']);
             return;
         }
-        // try to find index.md or README.md in the path
+        var ent = findInFileTree(file_tree, (element) => {
+            return element.fs_path === fs_path || element.fs_path+ path.sep === fs_path ;
+        });
+        
         var found = false;
         for (const file of default_index) {
             res_path = path.join(fs_path, file);
@@ -105,12 +109,30 @@ var handler = function (req, res) {
         }
 
         if (!found) {
-            var errmsg = 'Directory Description Not Found: ' + fs_path;
-            res.status(404).send(errmsg);
+            const posts = ent.children.filter(element => element.isfile);
+            const summaries = {};
+            posts.forEach(post => {
+                const content = fs.readFileSync(post.fs_path, 'utf8');
+                const parsed = matter(content);
+                summaries[post.site_path] = marked(parsed.content.trim().slice(0,tag_options.truncationLength) + '...');
+            });
+            ejs.renderFile(options.toc_template, {
+                'posts': posts,
+                'summaries': summaries,
+            }, function (err, str) {
+                if (err) {
+                    console.error('Error rendering template:', err);
+                    res.status(500).send('Error rendering template');
+                    return;
+                }
+                res.send(str);
+                return;
+            });
+            // var errmsg = 'Directory Description Not Found: ' + fs_path;
+            // res.status(404).send(errmsg);
             return;
         }
     }
-    console.log(`fs_path: ${fs_path}`);
     fs.readFile(fs_path, 'utf8', (err, data) => {
         if (err) {
             res.status(404).send('File Not Found: ' + fs_path);
@@ -130,14 +152,21 @@ var handler = function (req, res) {
         } else {
             var Results = matter(data);
             data = Results.content; // get the content of the markdown file
+            
             data = filter_before(data); // execute filter to the file
             var htmlRawContent = marked(data);
             htmlRawContent = filter_after(htmlRawContent); // execute filter to the file
+            var ent = findInFileTree(file_tree, (element) => {
+                return element.fs_path === fs_path;
+            });
             opts = {
+                show_pageupdown_button: Results.data.weight !== undefined,
+                pageup: ent.pageup ? ent.pageup.site_path : undefined,
+                pagedown: ent.pagedown ? ent.pagedown.site_path : undefined,
                 show_header: false,
                 show_footer: false,
                 show_time: true,
-                t: getTime(fs_path),
+                time: getTime(fs_path),
                 tags: Results.data.tags || [],
                 tagsurl: path.join(options.site_root , 'tags'),
                 content: htmlRawContent,
@@ -173,37 +202,34 @@ router.get('/tags/:tag', (req, res) => {
     if( !tags[tag]) {
         res.status(404).send('Tag Not Found: ' + tag);
         return;
-    }else{
-        const summaries = {};
-        const posts = tags[tag];
-        posts.forEach(post => {
-            // convert webpath to fs path
-            post_path = post.replace(options.site_root, options.md_base);
-            console.log(`post_path: ${post_path}`);
-            const content = fs.readFileSync(post_path, 'utf8');
-            const parsed = matter(content);
-            summaries[post] = marked(parsed.content.trim().slice(0,tag_options.truncationLength) + '...');
-        });
-        
-        ejs.renderFile(options.tags_template, {
-            'tag': tag,
-            'posts': posts,
-            'summaries': summaries,
-        },function (err, str) {
-            if (err) {
-                console.error('Error rendering template:', err);
-                res.status(500).send('Error rendering template');
-                return;
-            }
-            if(! Info['partial']){
-                renderFullPage(str).then((result) => {
-                    res.send(result);
-                });
-            }else{
-                res.send(str);
-            }
-        });
     }
+    const summaries = {};
+    const posts = tags[tag];
+    posts.forEach(post => {
+        const content = fs.readFileSync(post.fs_path, 'utf8');
+        const parsed = matter(content);
+        summaries[post.site_path] = marked(parsed.content.trim().slice(0,tag_options.truncationLength) + '...');
+    });
+    
+    ejs.renderFile(options.tags_template, {
+        'tag': tag,
+        'posts': posts,
+        'summaries': summaries,
+    },function (err, str) {
+        if (err) {
+            console.error('Error rendering template:', err);
+            res.status(500).send('Error rendering template');
+            return;
+        }
+        if(! Info['partial']){
+            renderFullPage(str).then((result) => {
+                res.send(result);
+            });
+        }else{
+            res.send(str);
+        }
+    });
+    
 });
 router.get('/', handler);
 router.get('/*pathlist', handler);

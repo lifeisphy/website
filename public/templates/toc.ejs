@@ -1,0 +1,10 @@
+<h2>TOC</h2>
+
+<ul class="passage-list">
+  <% posts.forEach(function(post) { %>
+    <li class="passage-item">
+      <a href="<%= post.site_path %>" data-partial="true"><%= post.filename.replace(/\.md/i,'') %></a> <div class="preview"><%- summaries[post.site_path] %></div>    
+    </li>
+  
+  <% }) %>
+</ul>
