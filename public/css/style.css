@@ -17,34 +17,6 @@ body::before {
   z-index: -1;
   pointer-events: none;
 }
-#content {
-  flex: 1;
-  /* 占据剩余空间 */
-  padding: 20px 10px;
-  /* 添加内边距 */
-  font-size: 1.2em;
-  line-height: 1.5em;
-  margin: 0;
-  background: transparent;
-  color: black;
-  height: 100vh;
-  /* 设置高度为视口高度 */
-  transition: all 0.3s ease;
-  /* 平滑过渡效果 */
-  overflow-y: auto;
-  /* 如果内容过长，允许滚动 */
-  img {
-    display: block;
-    margin: 0 auto;
-    max-width: 50%;
-    height: auto;
-  }
-}
-#content .time {
-  font-size: 0.8em;
-  font-family: monospace;
-  line-height: 1em;
-}
 body {
   margin: 0;
   display: flex;

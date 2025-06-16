@@ -5,10 +5,10 @@
 <% if(show_pageupdown_button) { %>
   <div class="pageupdown">
     <% if (pageup) { %>
-      <a id="pageupButton" class="pageupdown-btn" href="<%- pageup %>" data-partial="true">←</a>
+      <a id="pageupButton" class="pageupdown-btn" href="<%- pageup.site_path %>" data-partial="true">←</a>
     <% } %>
     <% if (pagedown) { %>
-      <a id="pagedownButton" class="pageupdown-btn" href="<%- pagedown %>" data-partial="true">→</a>
+      <a id="pagedownButton" class="pageupdown-btn" href="<%- pagedown.site_path %>" data-partial="true">→</a>
     <% } %>
   </div>
 <% } %>

@@ -6,6 +6,7 @@ options = {
     'page_template': 'public/templates/page.ejs',
     'tags_template': 'public/templates/tags.ejs',
     'toc_template': 'public/templates/toc.ejs',
+    'slides_template': 'public/templates/slides.ejs',
 }
 const path = require('path');
 function normalizePath(p) {

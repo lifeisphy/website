@@ -32,6 +32,7 @@ marked.use({
                 BlockExtensionGenerator('Proposition','purple'),
                 BlockExtensionGenerator('Proof','yellow'),
                 BlockExtensionGenerator('Remarks','aqua'),
+                BlockExtensionGenerator('Example','green'),
                 inlineKatex(opt), 
                 blockKatex(opt)],
 });
@@ -47,6 +48,7 @@ function parseRequest(req) {
     console.log(`Request path: ${req.path}`);
     const pathname = decodeURIComponent(req.path);
     const partial = req.query.partial === 'true'; // 是否为局部请求
+    const slides = req.query.slides === 'true'; // 是否为幻灯片请求
     // string is a path if it ends with a /, or the last part do not contain a dot
     // something like /a/b/c/, or /a/b/c
     const isPath = pathname.endsWith('/') || pathname.split('/').pop().indexOf('.') === -1;
@@ -56,6 +58,7 @@ function parseRequest(req) {
         partial: partial,
         isPath: isPath,
         filename: filename,
+        slides: slides,
         ext: isPath ? undefined : path.extname(pathname),
     };
 }
@@ -109,7 +112,8 @@ var handler = function (req, res) {
         }
 
         if (!found) {
-            const posts = ent.children.filter(element => element.isfile);
+            console.log(ent.children);
+            const posts = ent.children.filter(element => element.isfile && element.filename.endsWith('.md'));
             const summaries = {};
             posts.forEach(post => {
                 const content = fs.readFileSync(post.fs_path, 'utf8');
@@ -156,13 +160,14 @@ var handler = function (req, res) {
             data = filter_before(data); // execute filter to the file
             var htmlRawContent = marked(data);
             htmlRawContent = filter_after(htmlRawContent); // execute filter to the file
+            
             var ent = findInFileTree(file_tree, (element) => {
-                return element.fs_path === fs_path;
+            return element.fs_path === fs_path;
             });
             opts = {
                 show_pageupdown_button: Results.data.weight !== undefined,
-                pageup: ent.pageup ? ent.pageup.site_path : undefined,
-                pagedown: ent.pagedown ? ent.pagedown.site_path : undefined,
+                pageup: ent.pageup ,
+                pagedown: ent.pagedown,
                 show_header: false,
                 show_footer: false,
                 show_time: true,
@@ -170,8 +175,11 @@ var handler = function (req, res) {
                 tags: Results.data.tags || [],
                 tagsurl: path.join(options.site_root , 'tags'),
                 content: htmlRawContent,
+                'SpecifiedScreenWidth': 500,
             };
-            ejs.renderFile(options.content_template, opts, function (err, htmlContent) {
+            console.log(opts);
+            if(!Info['slides']) {
+                ejs.renderFile(options.content_template, opts, function (err, htmlContent) {
                 if (err) {
                     console.error('Error rendering template:', err);
                     res.status(500).send('Error rendering template');
@@ -188,7 +196,19 @@ var handler = function (req, res) {
                     res.send(htmlContent);
                     return;
                 }
-            });
+                });
+            } else{
+                ejs.renderFile(options.slides_template, opts, (err, htmlContent) => {
+                    if (err) {
+                        console.error('Error rendering template:', err);
+                        res.status(500).send('Error rendering template');
+                        return;
+                    }
+                    res.send(htmlContent);
+                    return;
+                }
+                );
+            }
         }
     });
 
