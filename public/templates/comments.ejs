@@ -1,0 +1,23 @@
+<div class="comments-section">
+    <h2>Comments (<%= comments.length %>)</h2>
+    <ul class="comments-list">
+        <% comments.forEach(function(comment, idx) { %>
+            <li class="comment" id="comment-<%= comment.index %>">
+                <div class="comment-header">
+                    <span class="comment-author"><%= comment.name %></span>
+                    <span class="comment-date"><%= comment.date %></span>
+                </div>
+                <div class="comment-content">
+                    <%= comment.content %>
+                </div>
+            </li>
+        <% }); %>
+    </ul>
+    <form class="comment-form" method="post" action="/comments">
+        <h3>Leave a Comment</h3>
+        <input type="hidden" name="postPath" value="<%= postPath %>">
+        <input type="text" name="name" placeholder="Your name" required>
+        <textarea name="content" placeholder="Your comment" required></textarea>
+        <button type="submit">Post Comment</button>
+    </form>
+</div>

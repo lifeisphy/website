@@ -1,12 +1,14 @@
 
 options = {
-    'site_root':'/notes',
+    'site_root':'/',
     'md_base': 'public/md',
     'content_template': 'public/templates/content.ejs',
     'page_template': 'public/templates/page.ejs',
     'tags_template': 'public/templates/tags.ejs',
     'toc_template': 'public/templates/toc.ejs',
     'slides_template': 'public/templates/slides.ejs',
+    'comments_dir': 'public/comments',
+    'comments_template': 'public/templates/comments.ejs',
 }
 const path = require('path');
 function normalizePath(p) {

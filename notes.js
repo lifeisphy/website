@@ -19,7 +19,7 @@ const {bgmList, pictureList} = require('./utils/sources.js');
 const { render } = require('less');
 // const template_string = fs.readFileSync(options.page_emplate, 'utf8');
 // console.log(ftree,tags);
-console.log(file_tree);
+// console.log(file_tree);
 opt = { throwOnError: false, macros: katex_macros ,strict: false};
 
 marked.use({
@@ -45,7 +45,7 @@ marked.use({
 // }));
 
 function parseRequest(req) {
-    console.log(`Request path: ${req.path}`);
+    // console.log(`Request path: ${req.path}`);
     const pathname = decodeURIComponent(req.path);
     const partial = req.query.partial === 'true'; // 是否为局部请求
     const slides = req.query.slides === 'true'; // 是否为幻灯片请求
@@ -84,7 +84,7 @@ function renderFullPage(content){
 }
 var handler = function (req, res) {
     const Info = parseRequest(req);
-    console.log(Info);
+    // console.log(Info);
     var fs_path = path.join(options.md_base, Info['pathname']);
     if (Info['isPath']) { // accessing a directory, make sure which file to show
         if(!fs.existsSync(fs_path,)){
@@ -112,7 +112,7 @@ var handler = function (req, res) {
         }
 
         if (!found) {
-            console.log(ent.children);
+            // console.log(ent.children);
             const posts = ent.children.filter(element => element.isfile && element.filename.endsWith('.md'));
             const summaries = {};
             posts.forEach(post => {
@@ -177,7 +177,7 @@ var handler = function (req, res) {
                 content: htmlRawContent,
                 'SpecifiedScreenWidth': 500,
             };
-            console.log(opts);
+            // console.log(opts);
             if(!Info['slides']) {
                 ejs.renderFile(options.content_template, opts, function (err, htmlContent) {
                 if (err) {
@@ -253,5 +253,37 @@ router.get('/tags/:tag', (req, res) => {
 });
 router.get('/', handler);
 router.get('/*pathlist', handler);
+
+var comments = require("./utils/comments.js");
+
+router.post('/comments', (req, res) => {
+    const postPath = req.body.postPath;
+    const name = req.body.name || 'Anonymous';
+    const content = req.body.content;
+    console.log(`Received comment for post: ${postPath}, name: ${name}, content: ${content}`);
+    if (!postPath || !content) {
+        res.status(400).send('Post path and content are required.');
+        return;
+    }
+
+    // Save the comment to a file
+    const comment = {
+        name: name,
+        content: content,
+        time: new Date().toISOString(),
+    };
+    const commentsFilePath = path.join(options.comments_dir, postPath + '.json');
+    print(commentsFilePath,comment);
+    if (!fs.existsSync(options.comments_dir)) {
+        fs.mkdirSync(options.comments_dir, { recursive: true });
+    }
+    let comments = [];
+    if (fs.existsSync(commentsFilePath)) {
+        comments = JSON.parse(fs.readFileSync(commentsFilePath, 'utf8'));
+    }
+    comments.push(comment);
+    fs.writeFileSync(commentsFilePath, JSON.stringify(comments, null, 2));
+    res.redirect(postPath);
+});
 // Home page route
 module.exports = router;
