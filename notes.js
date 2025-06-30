@@ -36,13 +36,7 @@ marked.use({
                 inlineKatex(opt), 
                 blockKatex(opt)],
 });
-// marked.use(
-//     {extensions: [ BlockExtension]}
-// );
-// marked.use(katexExtension({
-//     throwOnError: false,
-//     macros: katex_macros
-// }));
+
 
 function parseRequest(req) {
     // console.log(`Request path: ${req.path}`);
@@ -62,32 +56,21 @@ function parseRequest(req) {
         ext: isPath ? undefined : path.extname(pathname),
     };
 }
-function renderFullPage(content){
-    // 渲染完整页面
-    opts = { 
-        'file_tree': file_tree,
-        'content': content,
-        'SpecifiedScreenWidth': 500,
-        'bgmList': bgmList,
-        'pictureList': pictureList,
-    };
-    var ret = ejs.renderFile(options.page_template,opts);
-    return ret;
-    // var ret = ejs.renderFile(options.page_template, opts
-        // , 
-        // function (err, str) {
-        // if (err) {
-        //     console.error('Error rendering template:', err);
-        //     return 'Error rendering template';
-        // }
-    // );
-}
+
 var handler = function (req, res) {
     const Info = parseRequest(req);
     // console.log(Info);
     var fs_path = path.join(options.md_base, Info['pathname']);
+    var posts, summaries;
+    var content;
+    var opts = {};
+    opts.full_page = !Info['partial'];
+    opts.is_slides = Info['slides'];
+    opts.file_tree = file_tree;
+    opts.gen_toc = false;
+    opts.SpecifiedScreenWidth = 500; // for mobile devices
     if (Info['isPath']) { // accessing a directory, make sure which file to show
-        if(!fs.existsSync(fs_path,)){
+        if(!fs.existsSync(fs_path)){
             res.status(404).send('Directory Not Found: ' + Info['pathname']);
             return;
         }
@@ -98,9 +81,10 @@ var handler = function (req, res) {
         var ent = findInFileTree(file_tree, (element) => {
             return element.fs_path === fs_path || element.fs_path+ path.sep === fs_path ;
         });
-        
+        var res_path ='';
         var found = false;
         for (const file of default_index) {
+            // fill in the information of the requested file
             res_path = path.join(fs_path, file);
             Info.filename = file;
             Info.ext = path.extname(file);
@@ -110,109 +94,121 @@ var handler = function (req, res) {
                 break;
             }
         }
-
+        
         if (!found) {
-            // console.log(ent.children);
-            const posts = ent.children.filter(element => element.isfile && element.filename.endsWith('.md'));
-            const summaries = {};
+            // show table of contents
+            fs_path = null;
+            posts = ent.children.filter(element => element.isfile && element.filename.endsWith('.md'));
+            summaries = {};
             posts.forEach(post => {
-                const content = fs.readFileSync(post.fs_path, 'utf8');
-                const parsed = matter(content);
+                const parsed = matter(fs.readFileSync(post.fs_path, 'utf8'));
                 summaries[post.site_path] = marked(parsed.content.trim().slice(0,tag_options.truncationLength) + '...');
             });
-            ejs.renderFile(options.toc_template, {
+            opts.has_md = false;
+            opts.gen_toc = true;
+            opts.toc_info = {
                 'posts': posts,
                 'summaries': summaries,
-            }, function (err, str) {
-                if (err) {
-                    console.error('Error rendering template:', err);
-                    res.status(500).send('Error rendering template');
-                    return;
-                }
-                res.send(str);
-                return;
-            });
+            }
+            // ejs.renderFile(options.toc_template, {
+            //     'posts': posts,
+            //     'summaries': summaries,
+            // }, function (err, str) {
+            //     if (err) {
+            //         console.error('Error rendering template:', err);
+            //         res.status(500).send('Error rendering template');
+            //         return;
+            //     }
+            //     res.send(str);
+            //     return;
+            // });
             // var errmsg = 'Directory Description Not Found: ' + fs_path;
             // res.status(404).send(errmsg);
-            return;
+            // return;
         }
     }
-    fs.readFile(fs_path, 'utf8', (err, data) => {
-        if (err) {
+    if(fs_path){
+        opts.has_md = true;
+        if (Info['ext'] && Info['ext'] != '.md') {
+            // serve static file directly.
+            res.sendFile(path.resolve(fs_path), function (err) {
+                if (err) {
+                    console.error('Error serving file:', err);
+                    res.status(err.status || 404).send('Error serving file');   
+                }
+            });
+            return;
+        } 
+        try{
+            var data = fs.readFileSync(fs_path, 'utf8');
+        } catch (err) {
             res.status(404).send('File Not Found: ' + fs_path);
             return;
         }
-        var servestatic = Info['ext'] != '.md';
+        // process markdown content
+        var Results = matter(data);
+        data = Results.content; // get the content of the markdown file
+        data = filter_before(data); // execute filter to the file
+        var htmlRawContent = marked(data);
+        htmlRawContent = filter_after(htmlRawContent); // execute filter to the file
+        
+        // look up the corresponding entry in file_tree
+        var ent = findInFileTree(file_tree, (element) => {
+        return element.fs_path === fs_path;
+        });
+        var { comment_exists, get_comments } = require("./utils/comments.js");
+        opts.postPath = ent.site_path;
+        opts.show_pageupdown_button = Results.data.weight !== undefined;
+        opts.pageup = ent.pageup;
+        opts.pagedown = ent.pagedown;
+        opts.show_header = false;
+        opts.show_footer = false;
+        opts.show_time = true;
+        opts.time = getTime(fs_path);
+        opts.tags = Results.data.tags || [];
+        opts.tagsurl = path.join(options.site_root, 'tags');
+        opts.content = htmlRawContent;
+        opts.allow_comments = options.allow_comments;
+        opts.show_comments = comment_exists(ent.site_path);
+        opts.comments =  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [];
 
-        if (servestatic) {
-            // serve static file directly.
-            const absolutePath = path.resolve(fs_path);
-            res.sendFile(absolutePath, function (err) {
-                if (err) {
-                    console.error('Error serving file:', err);
-                    res.status(err.status || 404).send('Error serving file');
-                }
-            });
-        } else {
-            var Results = matter(data);
-            data = Results.content; // get the content of the markdown file
-            
-            data = filter_before(data); // execute filter to the file
-            var htmlRawContent = marked(data);
-            htmlRawContent = filter_after(htmlRawContent); // execute filter to the file
-            
-            var ent = findInFileTree(file_tree, (element) => {
-            return element.fs_path === fs_path;
-            });
-            opts = {
-                show_pageupdown_button: Results.data.weight !== undefined,
-                pageup: ent.pageup ,
-                pagedown: ent.pagedown,
-                show_header: false,
-                show_footer: false,
-                show_time: true,
-                time: getTime(fs_path),
-                tags: Results.data.tags || [],
-                tagsurl: path.join(options.site_root , 'tags'),
-                content: htmlRawContent,
-                'SpecifiedScreenWidth': 500,
-            };
-            // console.log(opts);
-            if(!Info['slides']) {
-                ejs.renderFile(options.content_template, opts, function (err, htmlContent) {
-                if (err) {
-                    console.error('Error rendering template:', err);
-                    res.status(500).send('Error rendering template');
-                    return;
-                }
-                if (!Info['partial']) {
-                    // 渲染完整页面
-                    renderFullPage(htmlContent).then((result) => {
-                        res.send(result);
-                    });
-                    return;
-                } else {
-                    // 渲染局部页面
-                    res.send(htmlContent);
-                    return;
-                }
-                });
-            } else{
-                ejs.renderFile(options.slides_template, opts, (err, htmlContent) => {
-                    if (err) {
-                        console.error('Error rendering template:', err);
-                        res.status(500).send('Error rendering template');
-                        return;
-                    }
-                    res.send(htmlContent);
-                    return;
-                }
-                );
-            }
+    }
+    
+
+    
+
+    // opts = {
+    //     // full_page: !Info['partial'],
+    //     // file_tree: file_tree,
+    //     // is_slides: Info['slides'],
+    //     // gen_toc: false,
+    //     // toc_info:  
+    //     show_pageupdown_button: Results.data.weight !== undefined,
+    //     pageup: ent.pageup ,
+    //     pagedown: ent.pagedown,
+    //     show_header: false,
+    //     show_footer: false,
+    //     show_time: true,
+    //     time: getTime(fs_path),
+    //     tags: Results.data.tags || [],
+    //     tagsurl: path.join(options.site_root , 'tags'),
+    //     content: htmlRawContent,
+    //     'SpecifiedScreenWidth': 500,
+    //     allow_comments: options.allow_comments,
+    //     show_comments: comment_exists(ent.site_path),
+    //     comments:  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [],
+    //     postPath: ent.site_path,
+    // };
+    console.log(opts);
+    ejs.renderFile(options.page_template, opts, function (err, str) {
+        if (err) {
+            console.error('Error rendering template:', err);
+            res.status(500).send('Error rendering template');
+            return;
         }
+        res.send(str);
+        return;
     });
-
-
 };
 
 router.get('/tags/:tag', (req, res) => {
@@ -254,35 +250,34 @@ router.get('/tags/:tag', (req, res) => {
 router.get('/', handler);
 router.get('/*pathlist', handler);
 
-var comments = require("./utils/comments.js");
+var {add_comment, ensure_post_exists} = require("./utils/comments.js");
+router.use(express.urlencoded({ extended: true }));
 
 router.post('/comments', (req, res) => {
-    const postPath = req.body.postPath;
-    const name = req.body.name || 'Anonymous';
-    const content = req.body.content;
+    const postPath = req.body.postPath || undefined;
+    const type = req.body.type || 'plain'; // 默认为 plain
+    const name = req.body.name || undefined;
+    const content = req.body.content || undefined;
+    if(!postPath || !content || !name) {
+        res.status(400).send('Post path, name and content are required.');
+        return;
+    }
     console.log(`Received comment for post: ${postPath}, name: ${name}, content: ${content}`);
     if (!postPath || !content) {
         res.status(400).send('Post path and content are required.');
         return;
     }
-
-    // Save the comment to a file
+    if(!ensure_post_exists(postPath)) {
+        res.status(404).send('Post not found: ' + postPath);
+        return;
+    }
     const comment = {
         name: name,
+        type: type,
         content: content,
         time: new Date().toISOString(),
     };
-    const commentsFilePath = path.join(options.comments_dir, postPath + '.json');
-    print(commentsFilePath,comment);
-    if (!fs.existsSync(options.comments_dir)) {
-        fs.mkdirSync(options.comments_dir, { recursive: true });
-    }
-    let comments = [];
-    if (fs.existsSync(commentsFilePath)) {
-        comments = JSON.parse(fs.readFileSync(commentsFilePath, 'utf8'));
-    }
-    comments.push(comment);
-    fs.writeFileSync(commentsFilePath, JSON.stringify(comments, null, 2));
+    add_comment(comment, postPath);
     res.redirect(postPath);
 });
 // Home page route

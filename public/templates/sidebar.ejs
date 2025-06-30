@@ -1,0 +1,24 @@
+
+<div id="sidebar">
+<% function renderEntries(entries) { %>
+    <% entries.forEach(function(entry) { %>
+        <% if (entry.isfile) { %>
+            <a href="<%= entry.site_path %>" class="sidebar-item" data-partial="true">
+                <%= entry.filename.split('.md')[0] %>
+            </a>
+        <% } else { %>
+            <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">
+                <a href="<%= entry.site_path %>" data-partial="true">📁 <%= entry.directory %></a>
+            </div>
+            <div id="<%= entry.id %>" class="sidebar-subitems" style="display: none;">
+                <% renderEntries(entry.children); %> <!-- Recursive call -->
+            </div>
+        <% } %>
+        <% }); %>
+    <% } %>
+        
+<% renderEntries(file_tree); %> <!-- Initial call -->
+</div>
+<button id="toggleButton">≡</button>
+<link rel="stylesheet" href="/css/dark/sidebar.css">
+<script src="/js/sidebar.js"></script>

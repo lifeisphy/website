@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="/css/dark/toolbar.css">
+<button id="toolbar-button">🔧</button>
+  <div id="toolbar">
+    <div class="toolbar-section toolbar-thm">
+      <span>Fontsize</span>
+      <button id="fontsize-plus" class="toolbar-btn">+</button>
+      <button id="fontsize-minus" class="toolbar-btn">-</button>
+    </div>
+
+    <div id="toolbar-background" class="toolbar-thm">
+      <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button><br>
+      <!--  <span class="toolbar-thm">pure background color:</span><br> --> 
+      <button class="toolbar-color-btn" style="background:#fff;" data-bg="#fff"></button>
+      <button class="toolbar-color-btn" style="background:#222;" data-bg="#222"></button>
+      <button class="toolbar-color-btn" style="background:#f4f4f4;" data-bg="#f4f4f4"></button>
+      <button class="toolbar-color-btn" style="background:#4CAF50;" data-bg="#4CAF50"></button>
+      <button class="toolbar-color-btn" style="background:#2196F3;" data-bg="#2196F3"></button>
+    </div>
+    <div id="toolbar-music">
+      <label id="bgmName" class="toolbar-thm"></label>
+      <div class="toolbar-section">
+        <button id="bgmChangeButton" class="toolbar-btn">🎲</button>
+        <button id="prevBGMButton" class="toolbar-btn">⏮</button>
+        <button id="bgmPlayButton" class="toolbar-btn">▶</button>
+        <button id="nextBGMButton" class="toolbar-btn">⏭</button>
+      </div>
+    </div>
+  </div>
+  <audio id="bgm" loop>
+    <source src="" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+<script src="/js/toolbar.js"></script>
+<script>
+  window.bgmList = <%- JSON.stringify(bgmList || []) %>;
+  window.SpecifiedScreenWidth = <%- JSON.stringify(SpecifiedScreenWidth || 600) %>;
+  window.pictureList = <%- JSON.stringify(pictureList || []) %>;
+</script>

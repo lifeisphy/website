@@ -1,0 +1,65 @@
+.comments-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.two-cols {
+  display: flex;
+}
+.comment {
+  background: rgba(76, 175, 80, 0.92);
+  border-radius: 6px;
+  margin: 16px 0;
+  padding: 12px 18px;
+  position: relative;
+  box-shadow: 0 2px 8px;
+  transition: background 0.2s;
+}
+.comment-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 6px;
+  color: #f4f4f4;
+}
+.comment-header .comment-author {
+  font-weight: bold;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1em;
+  margin-right: 10px;
+}
+.comment-header .comment-date {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85em;
+  font-weight: normal;
+  color: #f4f4f4;
+}
+.comment-content {
+  max-height: 4.5em;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.3s;
+  word-break: break-word;
+  color: #f4f4f4;
+}
+.comment-content.expanded {
+  max-height: none;
+}
+.comment-content.expanded:after {
+  opacity: 0;
+}
+.show-more-link {
+  display: block;
+  text-align: right;
+  font-size: 0.85em;
+  color: #f4f4f4;
+  cursor: pointer;
+  margin-top: 2px;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  float: right;
+  position: relative;
+  bottom: 20px;
+}

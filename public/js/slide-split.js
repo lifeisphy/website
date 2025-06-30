@@ -75,11 +75,3 @@ function renderSlides(slides) {
     });
 }
 
-// 4. Slide navigation
-// function showSlide(idx, slides) {
-//     const all = document.querySelectorAll('.slides');
-//     all.forEach((s, i) => s.classList.toggle('active', i === idx));
-//     // document.getElementById('slideNum').textContent = `${idx + 1} / ${slides.length}`;
-// }
-
-// 5. Main

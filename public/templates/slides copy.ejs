@@ -1,0 +1,30 @@
+<script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
+<script src="/js/slide-split.js"></script>
+<script src="/js/slides.js"></script>
+<link rel="stylesheet" href="/css/reveal.css">
+<link rel="stylesheet" href="/css/slides.css">
+<script>
+    window.onload = function () {
+        const contentDiv = document.getElementById('original-content');
+        const maxHeight = window.innerHeight;
+        let slides = splitContentByHeading(contentDiv);
+        slides = splitSlidesByHeight(slides, maxHeight);
+        renderSlides(slides);
+
+        Reveal.initialize({
+            center: false,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0,
+            embedded: false,
+            disableLayout: true
+        });
+    };
+</script>      
+<div class="reveal">
+    <div class="slides" id="slides"></div>
+</div>
+<div id="original-content" style="">
+    <%- content || 'Welcome to reveal.js' %>
+</div>
+

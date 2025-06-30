@@ -9,10 +9,18 @@ options = {
     'slides_template': 'public/templates/slides.ejs',
     'comments_dir': 'public/comments',
     'comments_template': 'public/templates/comments.ejs',
+    HOST: 'localhost',
+    PORT: 80,
+    allow_comments: true,
+    max_comment_limit: 10,
 }
 const path = require('path');
 function normalizePath(p) {
-    return p.replace(/[\\/]/g,path.sep);
+    if (typeof p === 'string') {
+        return p.replace(/[\\/]/g,path.sep);
+    }else {
+        return p;
+    }
 }
 // go over all keys in options and normalize them
 Object.keys(options).forEach(key => {

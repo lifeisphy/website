@@ -1,0 +1,86 @@
+#toolbar-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  background: #1a1a1a;
+  color: #f4f4f4;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2001;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#toolbar-button:hover {
+  background: #333;
+}
+#bgmName {
+  overflow: hidden;
+}
+#toolbar {
+  position: fixed;
+  bottom: 0;
+  display: hidden;
+  right: -340px;
+  width: 300px;
+  height: 30vh;
+  border-radius: 9px;
+  background: #1a1a1a;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.toolbar-color-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  padding: 2px;
+  margin-top: 9px;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.toolbar-color-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  border-color: #888;
+}
+#toolbar.open {
+  right: 0;
+}
+.toolbar-section {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toolbar-thm {
+  color: #f4f4f4;
+  padding: 6px 12px;
+  margin: 0 2px;
+}
+.toolbar-btn {
+  background: #1a1a1a;
+  color: #f4f4f4;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin: 0 2px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toolbar-btn:hover {
+  background: #333;
+}

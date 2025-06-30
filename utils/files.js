@@ -7,6 +7,13 @@ const options = require("../options.js").options;
 const base64 = (str) => {
     return Buffer.from(str).toString('base64');
 }
+
+if( !fs.existsSync(options.md_base)){
+    fs.mkdirSync(options.md_base, { recursive: true });
+}
+if (!fs.existsSync(options.comments_dir)) {
+    fs.mkdirSync(options.comments_dir, { recursive: true });
+}
 function readFileTree(pathname){
     var subtree = [];
     var files = fs.readdirSync(path.join(options.md_base, pathname));

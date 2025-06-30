@@ -1,3 +1,4 @@
+<% if(full_page) { %> 
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,76 +7,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Notes</title>
   <link rel="icon" type="image/png" href="/favicon.jpg">
-  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"> -->
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="/css/content.css">
-  <link rel="stylesheet" href="/css/toolbar.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+  <link rel="stylesheet" href="/css/dark/style.css">
+  <link rel="stylesheet" href="/css/dark/content.css">
   <link rel="stylesheet" href="/css/blocks.css">
   <link rel="stylesheet" href="/css/block-passage.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="/js/comments.js"></script>
 </head>
 
 <body>
-  <div id="sidebar">
-    <% function renderEntries(entries) { %>
-      <% entries.forEach(function(entry) { %>
-        <% if (entry.isfile) { %>
-            <a href="<%= entry.site_path %>" class="sidebar-item" data-partial="true">
-              <%= entry.filename.split('.md')[0] %>
-            </a>
-          <% } else { %>
-            <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">
-              <a href="<%= entry.site_path %>" data-partial="true">📁 <%= entry.directory %></a>
-            </div>
-            <div id="<%= entry.id %>" class="sidebar-subitems" style="display: none;">
-              <% renderEntries(entry.children); %> <!-- Recursive call -->
-            </div>
-            <% } %>
-              <% }); %>
-                <% } %>
-
-    <% renderEntries(file_tree); %> <!-- Initial call -->
-  </div>
-  <button id="toggleButton">≡</button>
+  <%- include('sidebar') %>
+  
   <div id="content">
-    <%- content || 'Welcome to the notes app!' %>
+<% } %>
+  <% if (gen_toc) { %>
+      <%- include('toc') %>
+  <% } %>
+  <% if (has_md) { %>
+    <% if( is_slides ) { %>
+      <%- include('slides copy') %>
+    <% } else { %>
+      <%- include('content') %>
+      <%- include('comments') %>
+      <% } %>
+    <% } %>
+<% if (full_page) { %>
   </div>
-  <button id="toolbar-button">🔧</button>
-  <div id="toolbar">
-    <div class="toolbar-section toolbar-thm">
-      <span>Fontsize</span>
-      <button id="fontsize-plus" class="toolbar-btn">+</button>
-      <button id="fontsize-minus" class="toolbar-btn">-</button>
-    </div>
-
-    <div id="toolbar-background" class="toolbar-thm">
-      <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button><br>
-      <!--  <span class="toolbar-thm">pure background color:</span><br> --> 
-      <button class="toolbar-color-btn" style="background:#fff;" data-bg="#fff"></button>
-      <button class="toolbar-color-btn" style="background:#222;" data-bg="#222"></button>
-      <button class="toolbar-color-btn" style="background:#f4f4f4;" data-bg="#f4f4f4"></button>
-      <button class="toolbar-color-btn" style="background:#4CAF50;" data-bg="#4CAF50"></button>
-      <button class="toolbar-color-btn" style="background:#2196F3;" data-bg="#2196F3"></button>
-    </div>
-    <div id="toolbar-music">
-      <label id="bgmName" class="toolbar-thm"></label>
-      <div class="toolbar-section">
-        <button id="bgmChangeButton" class="toolbar-btn">🎲</button>
-        <button id="prevBGMButton" class="toolbar-btn">⏮</button>
-        <button id="bgmPlayButton" class="toolbar-btn">▶</button>
-        <button id="nextBGMButton" class="toolbar-btn">⏭</button>
-      </div>
-    </div>
-  </div>
-  <audio id="bgm" loop>
-    <source src="" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
+  <%- include('toolbar') %>
 </body>
-<script>
-  window.bgmList = <%- JSON.stringify(bgmList || []) %>;
-  window.SpecifiedScreenWidth = <%- JSON.stringify(SpecifiedScreenWidth || 600) %>;
-  window.pictureList = <%- JSON.stringify(pictureList || []) %>;
-</script>
-<script src="/js/notes_main.js"></script>
 
 </html>
+<% } %>

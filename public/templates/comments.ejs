@@ -1,23 +1,56 @@
-<div class="comments-section">
-    <h2>Comments (<%= comments.length %>)</h2>
-    <ul class="comments-list">
-        <% comments.forEach(function(comment, idx) { %>
-            <li class="comment" id="comment-<%= comment.index %>">
-                <div class="comment-header">
-                    <span class="comment-author"><%= comment.name %></span>
-                    <span class="comment-date"><%= comment.date %></span>
-                </div>
-                <div class="comment-content">
-                    <%= comment.content %>
-                </div>
-            </li>
-        <% }); %>
-    </ul>
-    <form class="comment-form" method="post" action="/comments">
-        <h3>Leave a Comment</h3>
-        <input type="hidden" name="postPath" value="<%= postPath %>">
-        <input type="text" name="name" placeholder="Your name" required>
-        <textarea name="content" placeholder="Your comment" required></textarea>
-        <button type="submit">Post Comment</button>
+<!-- 
+comments: list[comment]
+comment: .name, .date, .content .type
+-->
+<div class="comments-section" data-updated="false">
+    <% if (allow_comments) { %>
+    <div class="line"></div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/neo.min.css">
+    <link rel="stylesheet" href="/css/dark/comments.css">
+
+    <h2>Leave a Comment</h2>
+    <form class="comment-form two-cols" method="post" action="/comments">
+        <div id="form-left" style="flex: 0 0 100%">
+            <div style="display: flex;">
+            <label><input type="radio" name="type" value="plain" checked>Plain</label>
+            <label><input type="radio" name="type" value="markdown">Markdown</label>
+            </div>
+            <input type="hidden" name="postPath" value="<%= postPath %>">
+            <input type="text" name="name" placeholder="Your nickname" required>
+            <textarea name="content" id="comment-content" placeholder="Your comment" required></textarea>
+            <button type="submit" class="button">Post Comment</button>
+        </div>
+        <div id="form-right" style="display: none;">
+            <label>Markdown Preview</label>
+            <div id="markdown-preview"></div>
+        </div>
     </form>
+    <% } %>
+    <% if(show_comments && comments.length > 0) { %>
+        <div class="line"></div>
+        <h2>Comments (<%= comments.length %>)</h2>
+        <ul class="comments-list">
+            <% comments.forEach(function(comment, idx) { %>
+                <li class="comment">
+                    <div class="comment-header">
+                        <span class="comment-author"><%= comment.name %></span>
+                        <span class="comment-time" data-iso="<%= comment.time %>"></span>
+                    </div>
+                    <% if (comment.type === 'markdown') { %>
+                        <div class="comment-content markdown-content" data-raw = "<%- encodeURIComponent(comment.content) %>">
+                        </div>
+                    <% } else { %>
+                        <div class="comment-content plain-content">
+                            <%- comment.content %>
+                        </div>
+                    <% } %>
+                </li>
+            <% }); %>
+        </ul>
+    <% } %>
 </div>
