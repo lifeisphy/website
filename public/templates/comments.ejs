@@ -11,6 +11,7 @@ comment: .name, .date, .content .type
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/monokai.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/neo.min.css">
+    <script type="text/javascript" src="/js/ext/purify.min.js"></script>
     <link rel="stylesheet" href="/css/dark/comments.css">
 
     <h2>Leave a Comment</h2>
@@ -31,26 +32,14 @@ comment: .name, .date, .content .type
         </div>
     </form>
     <% } %>
-    <% if(show_comments && comments.length > 0) { %>
+    <% if(show_comments && comments_count > 0) { %>
         <div class="line"></div>
-        <h2>Comments (<%= comments.length %>)</h2>
-        <ul class="comments-list">
-            <% comments.forEach(function(comment, idx) { %>
-                <li class="comment">
-                    <div class="comment-header">
-                        <span class="comment-author"><%= comment.name %></span>
-                        <span class="comment-time" data-iso="<%= comment.time %>"></span>
-                    </div>
-                    <% if (comment.type === 'markdown') { %>
-                        <div class="comment-content markdown-content" data-raw = "<%- encodeURIComponent(comment.content) %>">
-                        </div>
-                    <% } else { %>
-                        <div class="comment-content plain-content">
-                            <%- comment.content %>
-                        </div>
-                    <% } %>
-                </li>
-            <% }); %>
+        <h2>Comments (<%= comments_count %>)</h2>
+        <ul class="comments-list" data-max-per-page= "<%= max_comment_limit_per_page %>">
         </ul>
+        <div class="comments-pagination">
+            <button id="comments-prev" disabled><</button>
+            <button id="comments-next">></button>
+        </div>
     <% } %>
 </div>

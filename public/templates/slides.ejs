@@ -1,107 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <title>
-        <%= typeof title !=='undefined' ? title : 'Reveal.js Slides' %>
-    </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/reveal.css">
-    <link rel="stylesheet" href="/css/slides.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/blocks.css">
-    <link rel="stylesheet" href="/css/toolbar.css">
-</head>
-
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
-    <script src="/js/slide-split.js"></script>
-    <script>
-        window.onload = function () {
-            const contentDiv = document.getElementById('content');
-            const maxHeight = window.innerHeight;
-            let slides = splitContentByHeading(contentDiv);
-            slides = splitSlidesByHeight(slides, maxHeight);
-            renderSlides(slides);
-
-            Reveal.initialize({
-                center: false,
-                margin: 0.04,
-                minScale: 0.2,
-                maxScale: 2.0,
-                embedded: false,
-                disableLayout: true
-            });
-        };
-    </script>
-
-    <div id="sidebar">
-        <% function renderEntries(entries) { %>
-            <% entries.forEach(function(entry) { %>
-                <% if (entry.isfile) { %>
-                    <a href="<%= entry.site_path %>" class="sidebar-item" data-partial="true">
-                        <%= entry.filename.split('.md')[0] %>
-                    </a>
-                <% } else { %>
-                    <div class="sidebar-item" onclick="toggleSubItems('<%= entry.id %>')">
-                        <a href="<%= entry.site_path %>" data-partial="true">📁 <%= entry.directory %></a>
-                    </div>
-                    <div id="<%= entry.id %>" class="sidebar-subitems" style="display: none;">
-                        <% renderEntries(entry.children); %> <!-- Recursive call -->
-                    </div>
-                <% } %>
-                <% }); %>
-                <% } %>
-                
-                <% renderEntries(file_tree); %> <!-- Initial call -->
-            </div>
-    <button id="toggleButton">≡</button>
-            
-    <div id="content">
-        <div class="reveal">
-            <div class="slides" id="slides"></div>
-        </div>
-        <%- content || 'Welcome to reveal.js' %>
-    </div>
-    <button id="toolbar-button">🔧</button>
-    <div id="toolbar">
-        <div class="toolbar-section toolbar-thm">
-            <span>Fontsize</span>
-            <button id="fontsize-plus" class="toolbar-btn">+</button>
-            <button id="fontsize-minus" class="toolbar-btn">-</button>
-        </div>
-
-        <div id="toolbar-background" class="toolbar-thm">
-            <button id="bgpicChangeButton" class="toolbar-btn">Change Background Picture</button><br>
-            <!--  <span class="toolbar-thm">pure background color:</span><br> -->
-            <button class="toolbar-color-btn" style="background:#fff;" data-bg="#fff"></button>
-            <button class="toolbar-color-btn" style="background:#222;" data-bg="#222"></button>
-            <button class="toolbar-color-btn" style="background:#f4f4f4;" data-bg="#f4f4f4"></button>
-            <button class="toolbar-color-btn" style="background:#4CAF50;" data-bg="#4CAF50"></button>
-            <button class="toolbar-color-btn" style="background:#2196F3;" data-bg="#2196F3"></button>
-        </div>
-        <div id="toolbar-music">
-            <label id="bgmName" class="toolbar-thm"></label>
-            <div class="toolbar-section">
-                <button id="bgmChangeButton" class="toolbar-btn">🎲</button>
-                <button id="prevBGMButton" class="toolbar-btn">⏮</button>
-                <button id="bgmPlayButton" class="toolbar-btn">▶</button>
-                <button id="nextBGMButton" class="toolbar-btn">⏭</button>
-            </div>
-        </div>
-    </div>
-    <audio id="bgm" loop>
-        <source src="" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
+<script src="/js/slide-split.js"></script>
+<script src="/js/slides.js"></script>
+<link rel="stylesheet" href="/css/reveal.css">
+<link rel="stylesheet" href="/css/slides.css">
 <script>
-    window.bgmList = <% - JSON.stringify(bgmList || []) %>;
-    window.SpecifiedScreenWidth = <%- JSON.stringify(SpecifiedScreenWidth || 600) %>;
-    window.pictureList = <% - JSON.stringify(pictureList || []) %>;
-</script>
-<script src="/js/notes_main.js"></script>
-</body>
+    window.onload = function () {
+        const contentDiv = document.getElementById('original-content');
+        const maxHeight = window.innerHeight;
+        let slides = splitContentByHeading(contentDiv);
+        slides = splitSlidesByHeight(slides, maxHeight);
+        renderSlides(slides);
 
-</html>
+        Reveal.initialize({
+            center: false,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0,
+            embedded: false,
+            disableLayout: true
+        });
+        // hide original content to avoid duplication
+        document.getElementById('original-content').style.display = 'none';
+    };
+</script>      
+<div class="reveal">
+    <div class="slides" id="slides"></div>
+</div>
+<div id="original-content" style="">
+    <%- content || 'Welcome to reveal.js' %>
+</div>
+

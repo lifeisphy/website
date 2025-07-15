@@ -12,7 +12,7 @@ options = {
     HOST: 'localhost',
     PORT: 80,
     allow_comments: true,
-    max_comment_limit: 10,
+    max_comment_limit_per_page: 10,
 }
 const path = require('path');
 function normalizePath(p) {

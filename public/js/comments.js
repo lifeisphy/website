@@ -39,7 +39,7 @@ function renderMarkdownWithMath(text, preview) {
         return match;
       }
     });
-  preview.innerHTML = marked.parse(text);
+  preview.innerHTML = DOMPurify.sanitize( marked.parse(text));
 }
 
 function updateCommentSection() {
@@ -92,8 +92,86 @@ function updateCommentSection() {
   // textarea.addEventListener('input', updatePreview);
   typeRadios.forEach(radio => radio.addEventListener('change', updatePreview));
 }
+const renderer = new marked.Renderer();
+renderer.image = function(href, title, text) {
+  // return '';
+  // 如果是本地图片，添加 class
+  if (href.startsWith('/')) {
+    return `<img src="${href}" class="local-image" alt="${text}" title="${title || ''}">`;
+  }
+  // 否则正常渲染
+  return `<img src="${href}" alt="${text}" title="${title || ''}">`;
+}
+marked.setOptions({
+  gfm: true,
+  sanitize: false,
+  headerPrefix: ''
+})
 window.updateCommentSection = updateCommentSection;
 document.addEventListener('DOMContentLoaded', function() {
   updateCommentSection();
 });
 
+
+// comment pagination
+let commentStart = 0;
+let pageSize = 10;
+
+function loadComments(start = 0) {
+  const postPath = document.querySelector('input[name="postPath"]').value;
+  fetch(`/?get_comment=true&comment_start=${start}&postPath=${encodeURIComponent(postPath)}`)
+    .then(res => res.json())
+    .then(data => {
+      renderComments(data);
+      commentStart = start;
+      // 更新按钮状态
+      document.getElementById('comments-prev').disabled = commentStart <= 0;
+      document.getElementById('comments-next').disabled = data.length < pageSize;
+    });
+}
+
+function renderComments(comments) {
+  const list = document.querySelector('.comments-list');
+  list.innerHTML = '';
+  comments.forEach(comment => {
+    const li = document.createElement('li');
+    li.className = 'comment';
+    li.innerHTML = `
+      <div class="comment-header">
+        <span class="comment-author">${comment.name}</span>
+        <span class="comment-time" data-iso="${comment.time}"></span>
+      </div>
+      ${
+        comment.type === 'markdown'
+          ? `<div class="comment-content markdown-content" data-raw="${encodeURIComponent(comment.content)}"></div>`
+          : `<div class="comment-content plain-content">${comment.content}</div>`
+      }
+    `;
+    list.appendChild(li);
+  });
+  // 渲染 markdown
+  document.querySelectorAll('.markdown-content').forEach(div => {
+    const raw = decodeURIComponent(div.getAttribute('data-raw') || '');
+    renderMarkdownWithMath(raw,div);
+  });
+  // 时间本地化
+  document.querySelectorAll('.comment-time[data-iso]').forEach(span => {
+    const iso = span.getAttribute('data-iso');
+    span.textContent = new Date(iso).toLocaleString();
+  });
+}
+document.addEventListener('DOMContentLoaded', function(){
+  
+  if(document.getElementById('comments-prev')){
+    pageSize = parseInt(document.querySelector('.comments-list').dataset.maxPerPage,10);
+    document.getElementById('comments-prev').onclick = function() {
+      if (commentStart > 0) loadComments(commentStart - pageSize);
+    };
+    document.getElementById('comments-next').onclick = function() {
+      loadComments(commentStart + pageSize);
+    };
+  }
+  
+  // 初始化加载第一页
+  loadComments(0);
+});

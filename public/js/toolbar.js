@@ -72,6 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
       bgm.play();
     }
   });
+  document.getElementById('switch-mode-button').textContent = 
+    window.location.search.includes('slides=true') ? 'Switch to normal mode' : 'Switch to slide mode';
+  document.getElementById('switch-mode-button').addEventListener('click', () => {
+    const url = new URL(window.location.href);
+    if(url.searchParams.get('slides') === 'true') {
+      window.location.href= url.pathname; // Switch to normal mode
+    }else{
+      window.location.href= url.pathname + '?slides=true';
+    }
+  });
 });
 
 

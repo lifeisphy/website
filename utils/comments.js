@@ -12,6 +12,16 @@ function ensure_post_exists(postPath){
     const fs_path = path.join(options.md_base, postPath );
     return fs.existsSync(fs_path);
 }
+function get_comments_count(postPath) {
+    const fs_path = get_comment_path(postPath);
+    if (!fs.existsSync(fs_path)) {
+        return 0; // No comments file exists, return count as 0
+    }
+    const lines = fs.readFileSync(fs_path, 'utf8').split('\n');
+    const nonEmptyLines = lines.filter(line => line.trim() !== ''); // Filter out empty lines
+    return nonEmptyLines.length; // Return the count of non-empty lines
+}
+
 
 function get_comments(postPath, start=0, limit=options.max_comment_limit) {
     ret = [];
@@ -39,4 +49,4 @@ function add_comment(comment,postPath){
     return;
 }
 
-module.exports = { add_comment, get_comments, comment_exists, ensure_post_exists };
+module.exports = { add_comment, get_comments, comment_exists, ensure_post_exists, get_comments_count };

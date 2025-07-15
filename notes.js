@@ -43,6 +43,9 @@ function parseRequest(req) {
     const pathname = decodeURIComponent(req.path);
     const partial = req.query.partial === 'true'; // 是否为局部请求
     const slides = req.query.slides === 'true'; // 是否为幻灯片请求
+    const get_comment = req.query.get_comment === 'true'; // 是否为获取评论请求
+    
+    const comment_start = req.query.comment_start ? parseInt(req.query.comment_start) : 0; // 评论起始位置
     // string is a path if it ends with a /, or the last part do not contain a dot
     // something like /a/b/c/, or /a/b/c
     const isPath = pathname.endsWith('/') || pathname.split('/').pop().indexOf('.') === -1;
@@ -54,6 +57,8 @@ function parseRequest(req) {
         filename: filename,
         slides: slides,
         ext: isPath ? undefined : path.extname(pathname),
+        get_comment: get_comment,
+        comment_start: comment_start,
     };
 }
 
@@ -110,27 +115,15 @@ var handler = function (req, res) {
                 'posts': posts,
                 'summaries': summaries,
             }
-            // ejs.renderFile(options.toc_template, {
-            //     'posts': posts,
-            //     'summaries': summaries,
-            // }, function (err, str) {
-            //     if (err) {
-            //         console.error('Error rendering template:', err);
-            //         res.status(500).send('Error rendering template');
-            //         return;
-            //     }
-            //     res.send(str);
-            //     return;
-            // });
-            // var errmsg = 'Directory Description Not Found: ' + fs_path;
-            // res.status(404).send(errmsg);
-            // return;
         }
     }
     if(fs_path){
-        opts.has_md = true;
         if (Info['ext'] && Info['ext'] != '.md') {
             // serve static file directly.
+            if(!fs.existsSync(fs_path)){
+                res.status(404).send('File Not Found: ' + fs_path);
+                return;
+            }
             res.sendFile(path.resolve(fs_path), function (err) {
                 if (err) {
                     console.error('Error serving file:', err);
@@ -139,6 +132,7 @@ var handler = function (req, res) {
             });
             return;
         } 
+        opts.has_md = true;
         try{
             var data = fs.readFileSync(fs_path, 'utf8');
         } catch (err) {
@@ -156,7 +150,11 @@ var handler = function (req, res) {
         var ent = findInFileTree(file_tree, (element) => {
         return element.fs_path === fs_path;
         });
-        var { comment_exists, get_comments } = require("./utils/comments.js");
+        var { comment_exists, get_comments, get_comments_count } = require("./utils/comments.js");
+        if(Info['get_comment']) {
+            res.status(200).json(get_comments(ent.site_path,Info['comment_start'], options.max_comment_limit_per_page));
+            return;
+        }
         opts.postPath = ent.site_path;
         opts.show_pageupdown_button = Results.data.weight !== undefined;
         opts.pageup = ent.pageup;
@@ -171,35 +169,10 @@ var handler = function (req, res) {
         opts.allow_comments = options.allow_comments;
         opts.show_comments = comment_exists(ent.site_path);
         opts.comments =  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [];
-
+        opts.comments_count = comment_exists(ent.site_path) ? get_comments_count(ent.site_path) : 0;
+        opts.max_comment_limit_per_page = options.max_comment_limit_per_page;
     }
     
-
-    
-
-    // opts = {
-    //     // full_page: !Info['partial'],
-    //     // file_tree: file_tree,
-    //     // is_slides: Info['slides'],
-    //     // gen_toc: false,
-    //     // toc_info:  
-    //     show_pageupdown_button: Results.data.weight !== undefined,
-    //     pageup: ent.pageup ,
-    //     pagedown: ent.pagedown,
-    //     show_header: false,
-    //     show_footer: false,
-    //     show_time: true,
-    //     time: getTime(fs_path),
-    //     tags: Results.data.tags || [],
-    //     tagsurl: path.join(options.site_root , 'tags'),
-    //     content: htmlRawContent,
-    //     'SpecifiedScreenWidth': 500,
-    //     allow_comments: options.allow_comments,
-    //     show_comments: comment_exists(ent.site_path),
-    //     comments:  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [],
-    //     postPath: ent.site_path,
-    // };
-    console.log(opts);
     ejs.renderFile(options.page_template, opts, function (err, str) {
         if (err) {
             console.error('Error rendering template:', err);
