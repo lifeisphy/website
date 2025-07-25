@@ -48,6 +48,8 @@ function parseRequest(req) {
     const comment_start = req.query.comment_start ? parseInt(req.query.comment_start) : 0; // 评论起始位置
     // string is a path if it ends with a /, or the last part do not contain a dot
     // something like /a/b/c/, or /a/b/c
+    const comment_post_path = get_comment ? req.query.postPath : undefined; // 评论的文章路径
+
     const isPath = pathname.endsWith('/') || pathname.split('/').pop().indexOf('.') === -1;
     const filename = isPath ? undefined : pathname.split('/').pop();
     return {
@@ -58,6 +60,7 @@ function parseRequest(req) {
         slides: slides,
         ext: isPath ? undefined : path.extname(pathname),
         get_comment: get_comment,
+        comment_post_path : comment_post_path,
         comment_start: comment_start,
     };
 }
@@ -150,9 +153,10 @@ var handler = function (req, res) {
         var ent = findInFileTree(file_tree, (element) => {
         return element.fs_path === fs_path;
         });
+        console.log(ent);
         var { comment_exists, get_comments, get_comments_count } = require("./utils/comments.js");
         if(Info['get_comment']) {
-            res.status(200).json(get_comments(ent.site_path,Info['comment_start'], options.max_comment_limit_per_page));
+            res.status(200).json(get_comments(Info['comment_post_path'],Info['comment_start'], options.max_comment_limit_per_page));
             return;
         }
         opts.postPath = ent.site_path;
@@ -168,11 +172,11 @@ var handler = function (req, res) {
         opts.content = htmlRawContent;
         opts.allow_comments = options.allow_comments;
         opts.show_comments = comment_exists(ent.site_path);
-        opts.comments =  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [];
+        // opts.comments =  comment_exists(ent.site_path) ? get_comments(ent.site_path) : [];
         opts.comments_count = comment_exists(ent.site_path) ? get_comments_count(ent.site_path) : 0;
         opts.max_comment_limit_per_page = options.max_comment_limit_per_page;
     }
-    
+    console.log(opts.show_comments, opts.comments_count,opts.comments);
     ejs.renderFile(options.page_template, opts, function (err, str) {
         if (err) {
             console.error('Error rendering template:', err);

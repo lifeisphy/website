@@ -118,10 +118,14 @@ let commentStart = 0;
 let pageSize = 10;
 
 function loadComments(start = 0) {
+  console.log('Loading comments from start:', start);
   const postPath = document.querySelector('input[name="postPath"]').value;
-  fetch(`/?get_comment=true&comment_start=${start}&postPath=${encodeURIComponent(postPath)}`)
+  // construct current url + ?get ...
+
+  fetch(`?get_comment=true&comment_start=${start}&postPath=${encodeURIComponent(postPath)}`)
     .then(res => res.json())
     .then(data => {
+      console.log('Comments loaded:', data);
       renderComments(data);
       commentStart = start;
       // 更新按钮状态

@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             observer.observe(content_Div, { childList: true, subtree: true });
           }
           // update comments
-          
+          loadComments(0);
         })
         .catch(err => console.error('Error loading content:', err));
     }
@@ -73,5 +73,4 @@ window.addEventListener('DOMContentLoaded', () => {
   if (window.innerWidth < window.SpecifiedScreenWidth && !sidebar.classList.contains('collapsed')) {
     toggle();
   }
-  
 });
