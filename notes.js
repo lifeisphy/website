@@ -3,7 +3,6 @@ const { marked } = require('marked');
 const path = require('path');
 const markedKatex = require("marked-katex-extension");
 const express = require("express");
-const router = express.Router();
 const {inlineKatex, blockKatex} = require("./utils/katex_ext.ts");
 const { tags, file_tree, findInFileTree }= require("./utils/files.js");
 const ejs = require("ejs");
@@ -17,11 +16,21 @@ const { filter_before, filter_after } = require('./utils/mdFilter.js');
 const getTime = require('./utils/file_stat.js');
 const {bgmList, pictureList} = require('./utils/sources.js');
 const { render } = require('less');
-// const template_string = fs.readFileSync(options.page_emplate, 'utf8');
-// console.log(ftree,tags);
-// console.log(file_tree);
-opt = { throwOnError: false, macros: katex_macros ,strict: false};
 
+const data = require('./data.js');
+const session = require('express-session');
+const svgCaptcha = require('svg-captcha');
+
+var {add_comment, ensure_post_exists} = require("./utils/comments.js");
+const router = express.Router();
+router.use(express.urlencoded({ extended: true }));
+router.use(session({
+    secret: data.secret_key,
+    resave: false,
+    saveUninitialized: true
+}));
+
+opt = { throwOnError: false, macros: katex_macros ,strict: false};
 marked.use({
   gfm: true,
   breaks: true,
@@ -224,13 +233,24 @@ router.get('/tags/:tag', (req, res) => {
     });
     
 });
+router.get('/captcha', (req, res) => {
+    const captcha =  svgCaptcha.create();
+    req.session.captcha = captcha.text;
+    res.type('svg');
+    res.status(200).send(captcha.data);
+});
+
 router.get('/', handler);
 router.get('/*pathlist', handler);
 
-var {add_comment, ensure_post_exists} = require("./utils/comments.js");
-router.use(express.urlencoded({ extended: true }));
+
 
 router.post('/comments', (req, res) => {
+    const userCaptcha = req.body.captcha || undefined;
+    if(userCaptcha !== req.session.captcha) {
+        res.status(400).send('Captcha error');
+        return;
+    }
     const postPath = req.body.postPath || undefined;
     const type = req.body.type || 'plain'; // 默认为 plain
     const name = req.body.name || undefined;

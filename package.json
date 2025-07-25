@@ -2,12 +2,14 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "gray-matter": "^4.0.3",
     "image-size": "^2.0.2",
     "less": "^4.3.0",
     "marked": "^15.0.8",
     "marked-katex-extension": "^5.1.4",
     "open": "^10.1.2",
-    "reveal.js": "^5.2.1"
+    "reveal.js": "^5.2.1",
+    "svg-captcha": "^1.4.0"
   }
 }

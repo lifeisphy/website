@@ -42,7 +42,8 @@ function roll_bgm() {
     return;
   }
   const randomIndex = Math.floor(Math.random() * bgmList.length);
-  const selectedBgm = bgmList[randomIndex];
+  bgm_idx = randomIndex;
+  const selectedBgm = bgmList[bgm_idx];
   bgm.src = selectedBgm; // Set the BGM source
   bgmName.textContent = removeAfterLastDot(selectedBgm.split('\\').pop()); // Display the name of the selected BGM
   if (isPlaying) {

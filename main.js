@@ -4,10 +4,10 @@ const app = express();
 const options = require('./options.js').options;
 
 const notes = require('./notes.js');
-
 const { file_convert } = require('./utils/converter.js');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(options.site_root, notes);
+
 
 // parse from command line arguments
 process.argv.forEach((arg, idx, arr) => {

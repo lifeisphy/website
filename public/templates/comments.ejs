@@ -24,7 +24,13 @@ comment: .name, .date, .content .type
             <input type="hidden" name="postPath" value="<%= postPath %>">
             <input type="text" name="name" placeholder="Your nickname" required>
             <textarea name="content" id="comment-content" placeholder="Your comment" required></textarea>
-            <button type="submit" class="button">Post Comment</button>
+
+            <div style="display:flex; gap:10px; padding: 7px 0 0 4px;">
+                <img src="/captcha" alt="captcha">
+                <input type="text" name="captcha" placeholder="captcha(case sensitive)" required>
+                <button type="submit" class="button">Post Comment</button>
+            </div>
+            
         </div>
         <div id="form-right" style="display: none;">
             <label>Markdown Preview</label>
